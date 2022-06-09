@@ -158,6 +158,47 @@
     .columna2 {
         margin-left: 125px;
     }
+
+    .frow {
+        padding: 0;
+        margin: 0;
+        padding-bottom: 10px;
+    }
+
+    .actividad {
+        width: 100%;
+        height: 150px;
+        border-radius: 10px;
+        background-color: rgba(255, 255, 255, 0.6);
+        overflow: hidden;
+    }
+
+    h4 {
+        color: rgba(255, 255, 255, 0.7);
+        text-align: center;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: bolder;
+        font-size: 22px;
+    }
+
+    h5 {
+        text-align: center;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: bolder;
+        font-size: 18px;
+    }
+
+    h6 {
+        padding-left: 10px;
+        text-align: left;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: bolder;
+        font-size: 16px;
+    }
+
+    .alumnos {
+        text-align: center;
+    }
 </style>
 {% endblock %}
 {% block scripts %}
@@ -223,7 +264,7 @@
                     <hr>
                     <div class="row fila1">
                         <div class="title2">
-                            <h6>Campos Opcionales</h6>
+                            <h6 class="alumnos">Campos Opcionales</h6>
                         </div>
                         <div class="col">
                             <label for="inicializacion">Script de inicialización</label>
@@ -246,10 +287,61 @@
                 </form>
             </div>
         </div>
-        <h3>¡Parece que no hay actividades!</h3>
-        <div class="empty">
-            <img src="https://i.makeagif.com/media/12-15-2016/dJJGaw.gif" alt="empty">
-        </div>
+            {% if actividad == 1 %}
+                {% for act in ejercicios %}
+                <div class="row frow">
+                    <div class="col-sm-12">
+                        <div class="actividad">
+                            <div class="row">
+                                <div class="col-sm-5" style="background-color: #405fd7;">
+                                    <h4>Actividad: {{ act.titulo }}</h4>
+                                </div>
+                                <div class="col-sm-7" style="background-color: darkgreen;">
+                                    <h4>Fecha: {{ act.fecha }}</h4>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <h5>Descripción</h5>
+                                    <h6>{{ act.descripcion }}</h6>
+                                </div>
+                                <div class="col-sm-4">
+                                <h5>Scripts Proporcionados</h5>
+                                    {% if act.sInicializacion != '' %}
+                                    <h6>Inicialización <img width="auto" height="15" src="http://diezyuno.mx/wp-content/uploads/2020/11/kisspng-check-mark-computer-icons-clip-art-green-check-mark-2-icon-5ab1d1c074ab99.0084112415216030084779-300x300.png" alt="check"></h6>
+                                    {% else %}
+                                    <h6>Inicialización <img width="auto" height="15" src="https://www.pngmart.com/files/3/Red-Cross-Transparent-PNG.png" alt="red cross"></h6>
+                                    {% endif %}
+                                    {% if act.sParametros != '' %}
+                                    <h6>Comprobación de Parámetros <img width="auto" height="15" src="http://diezyuno.mx/wp-content/uploads/2020/11/kisspng-check-mark-computer-icons-clip-art-green-check-mark-2-icon-5ab1d1c074ab99.0084112415216030084779-300x300.png" alt="red cross"></h6>
+                                    {% else %}
+                                    <h6>Comprobación de Parámetros <img width="auto" height="15" src="https://www.pngmart.com/files/3/Red-Cross-Transparent-PNG.png" alt="red cross"></h6>
+                                    {% endif %}
+                                    {% if act.sEdoFinal != '' %}
+                                    <h6>Estado Final <img width="auto" height="15" src="http://diezyuno.mx/wp-content/uploads/2020/11/kisspng-check-mark-computer-icons-clip-art-green-check-mark-2-icon-5ab1d1c074ab99.0084112415216030084779-300x300.png" alt="red cross"></h6>
+                                    {% else %}
+                                    <h6>Estado Final <img width="auto" height="15" src="https://www.pngmart.com/files/3/Red-Cross-Transparent-PNG.png" alt="red cross"></h6>
+                                    {% endif %}
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="row">
+                                        <h5>Alumnos Calificados</h5>
+                                        <h6 class="alumnos">0 / {{ totalum }}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% elif actividad == 0 %}
+            <div class="noact">
+                <h3>¡Parece que no hay actividades!</h3>
+                <div class="empty">
+                    <img src="https://i.makeagif.com/media/12-15-2016/dJJGaw.gif" alt="empty">
+                </div>
+            </div>
+            {% endif %}
         <div class="botongpo">
             <h2>-> <button onclick="changeDisplay()" name="newGroup" id="newGroup">Crear Actividad</button> <-</h2>
         </div>

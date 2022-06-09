@@ -366,8 +366,18 @@ def crear_actividades(request):
                 if hayalumnos == True:
                     #Si hay alumnos registrados, se regresa la página con la opcion de crear actividad
                     #Se obtiene el objeto de grupo en donde se encuentran los alumnos
+                    #Se verifica si hay ejercicios disponibles
                     grupo = models.grupo.objects.get(idMaestro_id = maestro.id)
-                    return render(request, template, {'grupo': 1, 'alumnos': 1, 'actividad': 1, 'valor': grupo})
+                    ejercicios = models.ejercicios.objects.filter(idMaestro_id = maestro.id).exists()
+                    if ejercicios == True:
+                        #Se obtienen los ejercicios creados por el maestro y se reflejan en la página
+                        #También se obtiene el número de alumnos totales de la materia del maestro
+                        #Y los alumnos que ya resolvieron la actividad
+                        alumnos = models.alumnos.objects.filter(idMaestro_id = maestro.id).count()
+                        ex = models.ejercicios.objects.filter(idMaestro_id = maestro.id)
+                        return render(request, template, {'grupo': 1, 'alumnos': 1, 'actividad': 1, 'valor': grupo, 'ejercicios': ex, 'totalum': alumnos})
+                    else:
+                        return render(request, template, {'grupo': 1, 'alumnos': 1, 'actividad': 0, 'valor': grupo})
                 elif hayalumnos == False:
                     #Se obtiene el objeto de grupo en donde se encuentra el alumno
                     grupo = models.grupo.objects.get(idMaestro_id = maestro.id)
@@ -444,7 +454,7 @@ def crear_actividades(request):
             arreglo_inicializacion = ejecutar_inicializacion_maestro(inicializacion, maestro, titulo)
         else:
             arreglo_inicializacion = {'estado': inicializacion[0]}
-            
+
         contexto = {
             'titulo': titulo,
             'desc': descripcion,

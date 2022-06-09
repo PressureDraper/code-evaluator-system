@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    <title>Alumnos Docentes</title>
+{% endblock %}
+{% block styles %}
+	<link rel="stylesheet" href="{% static 'css/barStyles.css' %}">
+    <style>
+        .alumnost {
+            margin-top: 10%;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        table, th, td {
+            border: 1px solid;
+            text-align: center;
+            padding: 5px;
+            border-color: gray;
+        }
+
+        .rws {
+            background-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .submit-button {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .submit-button input {
+            width: 115px;
+            border-radius: 50px;
+            background-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .submit-button input:hover {
+            color: #009932;
+            background-color: rgba(255, 255, 255, 1);
+        }
+
+        h2 {
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: bolder;
+            font-size: 30px;
+        }
+
+        .selected {
+            color: #405fd7;
+        }
+    </style>
+{% endblock %}
+{% block header %}
+    <header>
+        <a href="#" class="title">Evaluador Turbo 3000</a>
+        <img class="profile" src="https://cdn-icons-png.flaticon.com/512/4270/4270285.png" alt="docente" width="50" height="50">
+        <div class="menu-icon">
+            <div class="btn-hamburger container-fluid"></div>
+            <div class="btn-hamburger2 container-fluid"></div>
+            <div class="btn-hamburger3 container-fluid"></div>
+        </div>
+        <ul id="tog" class="hide">
+            <li><a href="/docente">Inicio</a></li>
+            <li><a href="/crear">Actividades</a></li>
+            <li><a class="selected" href="/alumnos">Alumnos</a></li>
+            <li><a href="/grupo">Grupo</a></li>
+            <li><a href="/perfil">Perfil</a></li>
+            <li><a href="/logout">Cerrar Sesión</a></li>
+        </ul>
+    </header>
+{% endblock %}
+{% block content %}
+    <div class="alumnost">
+        <h2>Lista Total de Alumnos</h2>
+        <form action="/alumnos/" method="POST" id="form-box">
+            {% csrf_token %}
+            <table border="2">
+                <thead class="">
+                    <tr style="background-color:#009932">
+                        <th scope="col" colspan="1">#</th>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Usuario</th>
+                        <th scope="col">Correo Electrónico</th>
+                        <th scope="col">Asignado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for alumno in alumnos %}
+                    <tr class="rws">
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>{{ alumno.nombre }}</td>
+                        <td>{{ alumno.usuario }}</td>
+                        <td>{{ alumno.email }}</td>
+                        <td>
+                            <input type="checkbox" name="oculto" id="checkbox{{ forloop.counter }}" value="{{ alumno.id }}"/>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="submit-button">
+                <input type="submit" value="Registrar" name="send" id="send">
+            </div>
+        </form>
+    </div>
+{% endblock %}
+{% block scripts %}
+<script src="{% static 'js/stickyBar.js' %}" type="text/javascript"></script>
+<script>
+    let valoresCheck = [];
+    let ids = [];
+    var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+
+    $("#form-box").submit(function (e) {
+        // preventing from page reload and default actions
+        e.preventDefault();
+        $("input[type=checkbox]:checked").each(function(){
+            valoresCheck.push(this.value);
+            ids.push(this.id);
+        });
+        data = valoresCheck.map(x => ({aidi: x}));
+        jstring = JSON.stringify(data)
+        // make POST ajax call
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'checkboxes_form' %}",
+            headers:{
+                "X-CSRFToken": csrftoken
+            },
+            data: jstring,
+            success: function (response) {
+                window.location.href = "{% url 'showgroup' %}";
+                ids = [];
+            },
+            error: function (response) {
+                // alert the error if any error occured
+                alert(response["responseJSON"]["error"]);
+            }
+        })
+        valoresCheck = [];
+    })
+</script>
+{% endblock %}

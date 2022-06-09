@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    <title>Perfil</title>
+{% endblock %}
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/barStyles.css' %}">
+    <style>
+        .perfil {
+            text-align: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .perfil img {
+            margin-top: 8%;
+        }
+
+        h2 {
+            color: rgba(255, 255, 255, 0.7);
+            font-family: 'Fredoka', sans-serif;
+            font-weight: bolder;
+            font-size: 25px;
+        }
+
+        h3 {
+            font-family: 'Fredoka', sans-serif;
+            font-weight: bolder;
+            font-size: 20px;
+        }
+
+        .selected {
+            color: #405fd7;
+        }
+    </style>
+{% endblock %}
+{% block header %}
+    {% if usuario == 'alumno' %}
+    <header>
+        <a href="#" class="title">Evaluador Turbo 3000</a>
+        <img class="profile" src="https://cdn-icons-png.flaticon.com/512/2491/2491055.png" alt="alumno" width="50" height="50">
+        <div class="menu-icon">
+            <div class="btn-hamburger container-fluid"></div>
+            <div class="btn-hamburger2 container-fluid"></div>
+            <div class="btn-hamburger3 container-fluid"></div>
+        </div>
+        <ul id="tog" class="hide">
+            <li><a href="/alumno">Inicio</a></li>
+            <li><a href="/actividades">Actividades</a></li>
+            <li><a class="selected" href="/perfil">Perfil</a></li>
+            <li><a href="/logout">Cerrar Sesión</a></li>
+        </ul>
+    </header>
+    {% elif usuario == 'maestro' %}
+    <header>
+        <a href="#" class="title">Evaluador Turbo 3000</a>
+        <img class="profile" src="https://cdn-icons-png.flaticon.com/512/4270/4270285.png" alt="docente" width="50" height="50">
+        <div class="menu-icon">
+            <div class="btn-hamburger container-fluid"></div>
+            <div class="btn-hamburger2 container-fluid"></div>
+            <div class="btn-hamburger3 container-fluid"></div>
+        </div>
+        <ul id="tog" class="hide">
+            <li><a href="/docente">Inicio</a></li>
+            <li><a href="/crear">Actividades</a></li>
+            <li><a href="/alumnos">Alumnos</a></li>
+            <li><a href="/grupo">Grupo</a></li>
+            <li><a class="selected" href="/perfil">Perfil</a></li>
+            <li><a href="/logout">Cerrar Sesión</a></li>
+        </ul>
+    </header>
+    {% endif %}
+{% endblock %}
+{% block content %}
+    <div class="perfil">
+        <img src="https://cdn3.iconfinder.com/data/icons/avatar-set-2/512/Avata_06-512.png" alt="alumno" width="auto" height="200">
+        <h2>{{ nombre }}</h2>
+        <h3> {{ correo }}</h3>
+    </div>
+{% endblock %}

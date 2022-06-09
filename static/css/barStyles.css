@@ -1,0 +1,156 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: lightslategray;
+}
+
+header {
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.6);
+    transition: 0.6s;
+    padding: 25px 30px;
+    z-index: 50;
+}
+
+header.sticky {
+    padding: 5px 40px;
+}
+
+header .title {
+    color: #405fd7;
+    font-family: 'Ubuntu', sans-serif;
+    font-weight: bolder;
+    font-size: 30px;
+    text-decoration: none;
+}
+
+header .profile {
+    margin-left: 160px;
+}
+
+header ul {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+header ul li {
+    position: relative;
+    list-style: none;
+}
+
+header ul li a {
+    position: relative;
+    top: 10px;
+    margin: 0px 15px;
+    text-decoration: none;
+    color: #8893a7;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: bolder;
+    font-size: 18px;
+    transition: 0.6s;
+}
+
+@media only screen and (max-width: 900px) {
+    header .title {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        text-align: left;
+    }
+
+    header ul.shown {
+        width: 100%;
+        text-align: center;
+        display: block;
+        padding: 0 0;
+        margin: 0 0;
+    }
+
+    header ul.hide {
+        display: none;
+    }
+
+    header ul li {
+        display: block;
+        padding: 0 0;
+        margin: 0 0;
+        line-height: 5ex;
+    }
+
+    header {
+        float: none;
+        display: flex;
+        text-align: left;
+        flex-wrap: wrap;
+        padding: 35px 40px;
+        transition: all 0.6s ease;
+    }
+
+    header.sticky .menu-icon {
+        top: 9px;
+        transition: all 0.6s ease;
+    }
+
+    .menu-icon {
+        width: 50px;
+        height: 40px;
+        position: absolute;
+        display: block;
+        top: 35px;
+        right: 20px;
+        cursor: pointer;
+        padding: 0;
+        margin: 0;
+        border-style: solid;
+        border-color: #405fd7;
+        background-color: rgba(255, 255, 255, 0.8);
+        transition: all 0.6s ease;
+        border-radius: 25%;
+    }
+
+    .btn-hamburger {
+        position: inherit;
+        top: 4px;
+        left: 5px;
+        display: inline-block;
+        background-color: #405fd7;
+        height: 5px;
+        width: 35px;
+    }
+
+    .btn-hamburger2 {
+        position: absolute;
+        background-color: #405fd7;
+        height: 5px;
+        top: 15px;
+        left: 5px;
+        width: 35px;
+    }
+
+    .btn-hamburger3 {
+        position: inherit;
+        bottom: 4px;
+        display: inline-block;
+        background-color: #405fd7;
+        height: 5px;
+        left: 5px;
+        width: 35px;
+    }
+}

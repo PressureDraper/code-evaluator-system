@@ -1,0 +1,266 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    <title>Actividades - Maestro</title> 
+{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/barStyles.css' %}">
+<style>
+    h1 {
+        color: rgba(255, 255, 255, 0.7);
+        text-align: center;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: bolder;
+        font-size: 50px;
+    }
+
+    h2 {
+        color: rgba(255, 255, 255, 0.7);
+        text-align: center;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: bolder;
+        font-size: 30px;
+    }
+
+    h3 {
+        text-align: center;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: bolder;
+        font-size: 30px;
+    }
+
+    .top {
+        position: absolute;
+        margin: 0;
+        padding: 0;
+    }
+
+    .empty {
+        margin-top: 1%;
+        text-align: center;
+    }
+
+    .selected {
+        color: #405fd7;
+    }
+
+    .blurbackground {
+        position: absolute;
+        display: none;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        z-index: 60;
+        transition: opacity .7s;
+    }
+
+    .setGroup {
+        box-shadow: 10px 10px 10px;
+        border-radius: 25px;
+        margin-top: 6%;
+        margin-left: 10%;
+        width: 80%;
+        height: 80%;
+        background-color: rgba(255, 255, 255, 0.9);
+        text-align: center;
+        z-index: 70;
+    }
+
+    .inpenv {
+        align-self: center;
+        align-content: center;
+        text-align: center;
+    }
+
+    .inpsend {
+        width: 115px;
+        border-radius: 50px;
+        background-color: rgba(255, 255, 255, 0.6);
+    }
+
+    .inpsend:hover {
+        color: #009932;
+        background-color: rgba(255, 255, 255, 1);
+    }
+
+    #close {
+        position: absolute;
+        color: black;
+        font-size: 50px;
+        left: 85%;
+        top: 14%;
+    }
+
+    #close:hover {
+        color: #fff;
+        text-shadow:
+        0 0 5px rgba(0, 0, 0, 1),
+        0 0 10px rgba(0, 0, 0, 1),
+        0 0 20px rgba(0, 0, 0, 1),
+        0 0 30px rgba(0, 0, 0, 1),
+        0 0 40px rgba(0, 0, 0, 1);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .emptyGroup {
+        margin-top: 10%;
+    }
+
+    .botongpo {
+        margin-top: 1%;
+    }
+
+    .entry {
+        width: 400px;
+    }
+
+    .init {
+        width: 250px;
+        margin-left: 25%;
+    }
+
+    .param {
+        width: 250px;
+        margin-left: 38%;
+    }
+
+    .col-sm-6 {
+        width: 400px;
+    }
+
+    .fila1 {
+        padding-bottom: 37px;
+    }
+
+    .fila2 {
+        padding-bottom: 20px;
+    }
+
+    .descripcion {
+        resize: none;
+    }
+
+    .title3 {
+        width: 300px;
+    }
+
+    .title2 {
+        margin-top: -1%;
+    }
+
+    .columna1 {
+        margin-left: 50px;
+    }
+
+    .columna2 {
+        margin-left: 125px;
+    }
+</style>
+{% endblock %}
+{% block scripts %}
+	<script src="{% static 'js/openWindow.js' %}" type="text/javascript"></script>
+{% endblock %}
+{% block header %}
+    <header>
+        <a href="#" class="title">Evaluador Turbo 3000</a>
+        <img class="profile" src="https://cdn-icons-png.flaticon.com/512/4270/4270285.png" alt="docente" width="50" height="50">
+        <div class="menu-icon">
+            <div class="btn-hamburger container-fluid"></div>
+            <div class="btn-hamburger2 container-fluid"></div>
+            <div class="btn-hamburger3 container-fluid"></div>
+        </div>
+        <ul id="tog" class="hide">
+            <li><a href="/docente">Inicio</a></li>
+            <li><a class="selected" href="/crear">Actividades</a></li>
+            <li><a href="/alumnos">Alumnos</a></li>
+            <li><a href="/grupo">Grupo</a></li>
+            <li><a href="/perfil">Perfil</a></li>
+            <li><a href="/logout">Cerrar Sesión</a></li>
+        </ul>
+    </header>
+{% endblock %}
+{% block content %}
+    {% if grupo == 1 %}
+    <img class="top" src="https://1.bp.blogspot.com/-f_1AVR6hUEQ/XRy5aYOx1SI/AAAAAAAAGbw/bu2AY_PQ6t0ZdSYxQVxMVeNXelyv9FHPQCLcBGAs/s640/seguridad%2Binfo.jpg" width="100%" height="200" alt="header image">
+    <br><br><br><br><br><br><br><br><br>
+    <hr size="10" style="color: rgba(15, 10, 222, 1);">
+    <hr size="10" style="color: rgba(15, 10, 222, 1);">
+    <h1><img src="https://cdn-icons-png.flaticon.com/512/1746/1746673.png" alt="security icon" width="auto" height="50"> {{ valor.asignatura }} <img src="https://cdn-icons-png.flaticon.com/512/1746/1746673.png" alt="security icon" width="auto" height="50"></h1>
+    <hr size="10" style="color: rgba(15, 10, 222, 1);">
+        {% if alumnos == 1 %}
+        <div class="blurbackground" id="blurdiv">
+            <span id="close">&times;</span>
+            <div class="setGroup">
+                <form action="/crear/" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <h3 class="ejercicio">Creación de Ejercicio</h3>
+                    <div class="row">
+                        <div class="col">
+                            <label for="titulo">Nombre de la Actividad</label><br>
+                            <input type="text" name="titulo" class="title3" required>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-6 columna1">
+                            <label for="descripcion">Descripción</label><br>
+                            <textarea class="descripcion" name="descripcion" id="txt-descripción" cols="40" rows="5" required></textarea>
+                        </div>
+                        <div class="col-sm-6 columna2">
+                            <div class="row fila1">
+                                <label for="entrada">Entrada de Prueba</label>
+                                <input name="entrada" type="file" class="form-control form-control-sm entry" id="upload-entrada" required>
+                            </div>
+                            <div class="row">
+                                <label for="salida">Salida Esperada</label>
+                                <input name="salida" type="file" class="form-control form-control-sm output" id="upload-salida" required>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row fila1">
+                        <div class="title2">
+                            <h6>Campos Opcionales</h6>
+                        </div>
+                        <div class="col">
+                            <label for="inicializacion">Script de inicialización</label>
+                            <input name="inicializacion" type="file" class="form-control form-control-sm init" id="upload-inicializacion">
+                        </div>
+                        <div class="col">
+                            <label for="estado">Script de Comprobación de Estado</label>
+                            <input name="estado" type="file" class="form-control form-control-sm init" id="upload-estado">
+                        </div>
+                    </div>
+                    <div class="row fila2">
+                        <div class="col-sm-12">
+                            <label for="parametros">Script de Comprobación de Parámetros</label>
+                            <input name="parametros" type="file" class="form-control form-control-sm param" id="upload-parametros">
+                        </div>
+                    </div>
+                    <div class="inpenv">
+                        <input class="inpsend" type="submit" name="sendForm" value="Analizar">
+                    </div>
+                </form>
+            </div>
+        </div>
+        <h3>¡Parece que no hay actividades!</h3>
+        <div class="empty">
+            <img src="https://i.makeagif.com/media/12-15-2016/dJJGaw.gif" alt="empty">
+        </div>
+        <div class="botongpo">
+            <h2>-> <button onclick="changeDisplay()" name="newGroup" id="newGroup">Crear Actividad</button> <-</h2>
+        </div>
+        {% elif alumnos == 0 %}
+        <h2>¡No hay alumnos registrados!</h2>
+        <h2>-> <a href="/alumnos"><button>Registrar Alumnos</button></a> <-</h2>
+        {% endif %}
+    {% elif grupo == 0 %}
+    <div class="emptyGroup">
+        <h2>¡No hay grupos disponibles!</h2>
+        <h2>-> <a href="/grupo"><button>Crear Grupo</button></a> <-</h2>
+    </div>
+    {% endif %}
+{% endblock %}

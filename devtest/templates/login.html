@@ -1,0 +1,62 @@
+{% extends 'loglike.html' %}
+{% load static %}
+{% block styles %}
+	<link rel="stylesheet" href="{% static 'css/loginStyles.css' %}">
+{% endblock %}
+{% block scripts %}
+	<script src="{% static 'js/changeWindow.js' %}" type="text/javascript"></script>
+	<script src="{% static 'js/sqliUser.js' %}" type="text/javascript"></script>
+	<script src="{% static 'js/sqliPassword.js' %}" type="text/javascript"></script>
+	<script src="{% static 'js/patronEmail.js' %}" type="text/javascript"></script>
+	<script src="{% static 'js/loginValidations.js' %}" type="text/javascript"></script>
+	<script src="{% static 'js/hideAlertLoginError.js' %}" type="text/javascript"></script>
+	<script src="{% static 'js/enter.js' %}" type="text/javascript"></script>
+{% endblock %}
+{% block login %}
+	<form class="form-group" action="/login/" method="POST">
+		{% csrf_token %}
+		<div class="in-1">
+			<input class="inp" type="text" id="matricula" name="user" maxlength="10" required onkeypress="return sqli(event)">
+			<label class="form-label"><span class="search">Usuario</span></label>
+			<br>
+			<br>
+			<br>
+			<br>
+			<input class="inp2" type="password" id="passwd" name="passwd" required onkeypress="return pwd(event)">
+			<label class="form-label2"><span class="search2">Contraseña</span></label>
+		</div>
+		<div class="btn-login">
+			<input class="btn-login btn btn-success" type="submit" name="enviar" value="Iniciar Sesión" id="iniciarSesion">
+		</div>
+		<div class="div-textreg">
+			<span class="text-reg">¿No tienes una cuenta?
+				<div class="div-regist">
+					<input class="btn-regist btn btn-success" type="button" name="regist" value="Regístrate" id="btn-regist" onclick="ocultar()">
+				</div>
+			</span>
+		</div>
+	</form>
+{% endblock %}
+{% block regist %}
+	<form class="form-group2" action="/login/" method="POST" id="fg2">
+		{% csrf_token %}
+		<div class="in-2">
+			<div class="el1">
+				<select class="form-control" id="sel1" name="role">
+					<option value="" selected disabled hidden>Seleccionar Rol</option>
+					<option>Estudiante</option>
+					<option>Maestro</option>
+				</select>
+			</div>
+			<div class="el2">
+				<input class="inp3" type="text" id="email" name="email" required onkeypress="return eml(event)">
+				<label class="form-label4"><span class="search4">Correo Institucional</span></label>
+			</div>
+			<input class="inp2" type="password" id="pass2" name="passwd" required onkeypress="return pwd(event)">
+			<label class="form-label3"><span class="search3">Contraseña</span></label>
+			<div class="div-regform">
+				<input class="btn-regist btn btn-success" type="submit" name="registrar" value="Registrarse" id="btn-enviar">
+			</div>
+		</div>
+	</form>
+{% endblock %}

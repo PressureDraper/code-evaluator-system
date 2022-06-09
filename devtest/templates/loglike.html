@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="login for web dev project">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<title>Login</title>
+	{% block styles %}{% endblock %}
+</head>
+<body>
+	<noscript>
+		<div class="noscript">
+			<strong>Lo sentimos pero esta página no puede trabajar bien sin JavaScript. Porfavor habilítalo para continuar.</strong>
+		</div>
+	</noscript>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col" id="dos">
+				<div class="heading" align="center">
+					<div class="spanuv" id="divuv">
+						<a href="/login/"><img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/8/8f/Logo_de_la_Universidad_Veracruzana.svg" width="200" height="130"></a>
+						<br>
+						<span class="reg-title2">Evaluador Turbo3000</span>
+					</div>
+				</div>
+				<div class="divform" align="center">
+					{% block login %}{% endblock %}
+				</div>
+				<div class="divform2" align="center" style="display: none;">
+					<div class="reg-text" align="center">
+						<span class="reg-title">Registro</span>
+					</div>
+					{% block regist %}{% endblock %}
+				</div>
+			</div>
+			<div class="col" id="uno">
+				<div class="alert alert-danger" id="alert"></div>
+				{% if valor == 1 %}
+					<div class="alert2 alert-danger" id="alert2" style="display: inherit;">
+						<span class='err'>¡Error!</span><br>
+						1. <strong>Registro</strong> inválido. Por favor verifique correctamente los datos.
+					</div>
+				{% endif %}	
+				<img class="fei" src="https://i.ibb.co/jHCRjnW/fei.png">
+			</div>
+		</div>
+	</div>
+	{% block scripts %}{% endblock %}
+</body>
+</html>

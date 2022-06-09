@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis Preliminar</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka&display=swap');
+
+        body {
+            background-image: url("https://thumbs.gfycat.com/RingedSpicyKodiakbear-size_restricted.gif");
+            background-size: auto;
+        }
+
+        .mainc {
+            background-color: rgba(255, 255, 255, 0.9);
+            width: 70vw;
+            margin-left: 15vw;
+        }
+
+        a {
+            color: #405fd7;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: bolder;
+            font-size: 30px;
+            text-decoration: none;
+        }
+
+        h2 {
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: bolder;
+            font-size: 23px;
+        }
+
+        h3 {
+            margin: 10px;
+            color: #405fd7;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: bolder;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .cent {
+            text-align: center;
+        }
+
+        .f1 {
+            padding: 0;
+            margin: 0;
+        }
+
+        .sep {
+            background-color: rgba(0, 0, 0, 1);
+        }
+
+        .title3 {
+            width: 500px;
+            text-align: center;
+            border: 0;
+            outline: none;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: bolder;
+            font-size: 20px;
+            background-color: rgba(255, 255, 255, 0);
+        }
+
+        textarea {
+            resize: none;
+        }
+
+        .ff {
+            padding-bottom: 10px;
+        }
+        
+        .actitle {
+            font-size: 20px;
+        }
+
+        p {
+            font-family: 'Ubuntu', sans-serif;
+            font-size: 18px;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+
+        pre {
+            display: inline-block;
+            text-align: left;
+        }
+
+        .f2 {
+            text-align: center;
+        }
+
+        .f5 {
+            display: inline-block;
+            text-align: left;
+        }
+
+        .f7 {
+            padding-bottom: 20px;
+        }
+
+        .f8 {
+            padding-bottom: 30px;
+        }
+
+        .tooltiptext {
+            visibility: hidden;
+            width: 350px;
+            background-color: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            font-family: 'Ubuntu', sans-serif;
+            font-size: 14px;
+            padding: 5px 0;
+
+            /* Position the tooltip */
+            position: absolute;
+            z-index: 1;
+        }
+
+        .error:hover {
+            color: red;
+            transition: 0.5s;
+        }
+
+        .error {
+            color: black;
+            transition: 0.5s;
+        }
+
+        .error:hover .tooltiptext{
+            visibility: visible;
+        }
+
+        .inpsend {
+            width: 180px;
+            border-radius: 50px;
+            background-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .inpsend:hover {
+            color: #009932;
+            background-color: rgba(255, 255, 255, 1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid mainc">
+        <div class="row f1 cent">
+            <a href="#" class="title">Evaluador Turbo 3000</a>
+            <h2>Análisis Preliminar</h2>
+        </div>
+        <hr class="sep" size="10">
+        <div class="row f2">
+            <form action="/crear/analisis" method="POST">
+                <div class="row ff cent">
+                    <h3>Nombre de la Actividad</h3>
+                    <input type="text" name="titulo" class="title3" value="{{ titulo }}" readonly>
+                </div>
+                <div class="row ff cent">
+                    <h3>Descripción</h3>
+                    <p>{{ desc }}</p>
+                </div>
+                <div class="row f3">
+                    <h3>Entrada(s) de Prueba</h3>
+                    <pre>{{ entrada.contenido }}</pre>
+                </div>
+                <div class="row f4">
+                    <h3>Salida Esperada</h3>
+                    <pre>{{ salida.contenido }}</pre>
+                </div>
+                <div class="row f5">
+                    <h3>Script de Inicialización</h3>
+                    {% if init.estado == 0 %}
+                        {% if init.contenido.dir != '' %}
+                        <pre>{{ init.contenido.dir }}</pre>
+                        {% elif init.contenido.user != '' %}
+                        <pre>{{ init.contenido.user }}</pre>
+                        {% elif init.contenido.pip != '' %}
+                        <pre>{{ init.contenido.pip }}</pre>
+                        {% elif init.contenido.extra != '' %}
+                        <pre>{{ init.contenido.extra }}</pre>
+                        {% endif %}
+                    {% elif init.estado == 1 %}
+                        <p><img width="auto" height="10" src="https://cdn.pixabay.com/photo/2013/03/29/13/39/remove-97616_640.png" alt="not given"> No Proporcionado</p>
+                    {% elif init.estado == 2 %}
+                    <p>
+                        <img width="auto" height="13" src="https://www.pngmart.com/files/3/Red-Cross-Transparent-PNG.png" alt="error"> Error 
+                        <span class="error">(?)
+                            <span class="tooltiptext">
+                                ¡Por favor verifica el archivo {{ init.nombre }}!<br>
+                                Debe cumplir las siguientes especificaciones:<br>
+                                1. Extensión .py o .sh<br>
+                                2. No debe ser un archivo vacío<br>
+                                3. Debe correponder a un Script de Inicialización<br>
+                                    - Crear directorios o archivos<br>
+                                    - Crear usuarios<br>
+                                    - Instalar librerias<br>
+                                Cualquier otro caso no es considerado.
+                            </span>
+                        </span>
+                    </p>
+                    {% endif %}
+                </div>
+                <div class="row f6">
+                    <h3>Script de Comprobación de Estado</h3>
+                    {% if estado.estado == 0 %}
+                        {% if estado.contenido != '' %}
+                        <pre>{{ estado.contenido }}</pre>
+                        {% endif %}
+                    {% elif estado.estado == 1 %}
+                        <p><img width="auto" height="10" src="https://cdn.pixabay.com/photo/2013/03/29/13/39/remove-97616_640.png" alt="not given"> No Proporcionado</p>
+                    {% elif estado.estado == 2 %}
+                    <p>
+                        <img width="auto" height="13" src="https://www.pngmart.com/files/3/Red-Cross-Transparent-PNG.png" alt="error"> Error 
+                        <span class="error">(?)
+                            <span class="tooltiptext">
+                                ¡Por favor verifica el archivo {{ estado.nombre }}!<br>
+                                Debe cumplir las siguientes especificaciones:<br>
+                                1. Extensión .py o .sh<br>
+                                2. No debe ser un archivo vacío
+                        </span>
+                    </p>
+                    {% endif %}
+                </div>
+                <div class="row f7">
+                    <h3>Script de Comprobación de Parámetros</h3>
+                    {% if parametros.estado == 0 %}
+                        {% if parametros.contenido != '' %}
+                        <pre>{{ parametros.contenido }}</pre>
+                        {% endif %}
+                    {% elif parametros.estado == 1 %}
+                        <p><img width="auto" height="10" src="https://cdn.pixabay.com/photo/2013/03/29/13/39/remove-97616_640.png" alt="not given"> No Proporcionado</p>
+                    {% elif parametros.estado == 2 %}
+                    <p>
+                        <img width="auto" height="13" src="https://www.pngmart.com/files/3/Red-Cross-Transparent-PNG.png" alt="error"> Error 
+                        <span class="error">(?)
+                            <span class="tooltiptext">
+                                ¡Por favor verifica el archivo {{ parametros.nombre }}!<br>
+                                Debe cumplir las siguientes especificaciones:<br>
+                                1. Extensión .py o .sh<br>
+                                2. No debe ser un archivo vacío
+                        </span>
+                    </p>
+                    {% endif %}
+                </div>
+                <hr>
+                <div class="row f8">
+                    <form action="{% url 'precheck' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" value="{{ titulo }}" name="htitle">
+                        <h2>¿Los datos son correctos?</h2>
+                        <input class="inpsend" type="submit" name="yes" value="Si, Guardar Ejercicio">
+                        <input class="inpsend" type="submit" name="no" value="No, Volver a Subir Archivos">
+                    </form>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

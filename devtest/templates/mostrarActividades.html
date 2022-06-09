@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    <title>Actividades - Alumno</title> 
+{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="{% static 'css/barStyles.css' %}">
+<style>
+    h1 {
+        color: rgba(255, 255, 255, 0.7);
+        text-align: center;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: bolder;
+        font-size: 50px;
+    }
+
+    h2 {
+        text-align: center;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: bolder;
+    }
+
+    .empty {
+        text-align: center;
+    }
+
+    .selected {
+            color: #405fd7;
+        }
+    
+    .top {
+        position: absolute;
+        margin: 0;
+        padding: 0;
+    }
+</style>
+{% endblock %}
+{% block header %}
+    <header>
+        <a href="#" class="title">Evaluador Turbo 3000</a>
+        <img class="profile" src="https://cdn-icons-png.flaticon.com/512/2491/2491055.png" alt="alumno" width="50" height="50">
+        <div class="menu-icon">
+            <div class="btn-hamburger container-fluid"></div>
+            <div class="btn-hamburger2 container-fluid"></div>
+            <div class="btn-hamburger3 container-fluid"></div>
+        </div>
+        <ul id="tog" class="hide">
+            <li><a href="/alumno">Inicio</a></li>
+            <li><a class="selected" href="/actividades">Actividades</a></li>
+            <li><a href="/perfil">Perfil</a></li>
+            <li><a href="/logout">Cerrar Sesión</a></li>
+        </ul>
+    </header>
+{% endblock %}
+{% block content %}
+    {% if grupo == 1 %}
+    <img class="top" src="https://1.bp.blogspot.com/-f_1AVR6hUEQ/XRy5aYOx1SI/AAAAAAAAGbw/bu2AY_PQ6t0ZdSYxQVxMVeNXelyv9FHPQCLcBGAs/s640/seguridad%2Binfo.jpg" width="100%" height="200" alt="header image">
+    <br><br><br><br><br><br><br><br>
+    <br>
+    <hr size="10" style="color: rgba(15, 10, 222, 1);">
+    <hr size="10" style="color: rgba(15, 10, 222, 1);">
+    <h1><img src="https://cdn-icons-png.flaticon.com/512/1746/1746673.png" alt="security icon" width="auto" height="50"> {{ valor.asignatura }} <img src="https://cdn-icons-png.flaticon.com/512/1746/1746673.png" alt="security icon" width="auto" height="50"></h1>
+    <hr size="10" style="color: rgba(15, 10, 222, 1);">
+        {% if actividades == 1 %}
+        <h1>Hay actividades</h1>
+        {% elif actividades == 0 %}
+        <h2>¡No hay actividades!</h2>
+        <div class="empty">
+            <img class="buu" src="https://www.fotosdememes.com/wp-content/uploads/2021/09/esta-vacio.jpg" width="auto" height="500" alt="empty">
+        </div>
+        {% endif %}
+    {% elif grupo == 0 %}
+    <h1>No hay grupo</h1>
+    {% endif %}
+{% endblock %}

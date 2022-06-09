@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Django File Upload</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+        * {
+            font-family: "Roboto";
+        }
+
+        body {
+            background-color: #F5F5F5;
+        }
+
+        form {
+            background-color: #FFFFFF;
+            padding: 25px;
+        }
+    </style>
+</head>
+<body>
+    <form action="/upload/" method="POST" enctype="multipart/form-data" id="file">
+        {% csrf_token %}
+        <input type="text" name="fileTitle" placeholder="Enter a title">
+        <input type="file" name="file">
+        <input type="submit" name="subir" value="subir">
+    </form>
+</body>
+</html>

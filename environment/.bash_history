@@ -340,3 +340,6 @@ apt install x11-apps
 apt-get install x11-apps
 clear
 exit
+pip install --upgrade pip
+pip install uuid
+exit

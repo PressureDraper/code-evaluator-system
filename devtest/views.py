@@ -410,30 +410,6 @@ def crear_actividades(request):
             arreglo_salida = quitar_saltos_vacios(vsalida)
         else:
             arreglo_salida = vsalida
-
-        #Guardamos los datos a modo de prueba si no pasan posteriores verificaciones se eliminarán
-        # try:
-        #     obj = models.ejercicios(
-        #         idMaestro=maestro,
-        #         titulo=titulo,
-        #         descripcion=descripcion,
-        #         sInicializacion=sInicializacion,
-        #         sEntradas=sEntradas,
-        #         sSalida=sSalida,
-        #         sParametros=sParametros,
-        #         sEdoFinal=sEdoFinal,
-        #         visible=0
-        #     )
-        #     obj.save()
-        # except Exception as e:
-        #     print(e)
-        
-        #para el script de inicializacion si fue proporcionado lo ejecutaremos con las credenciales dadas, en el directorio root del
-        #usuario default y retornaremos el resultado de la ejecución
-        if inicializacion[0] == 0:
-            arreglo_inicializacion = ejecutar_inicializacion_maestro(inicializacion, maestro, titulo)
-        else:
-            arreglo_inicializacion = {'estado': inicializacion[0]}
         
         if estado[0] == 0:
             arreglo_estado = leer_sparametros(estado)
@@ -445,6 +421,31 @@ def crear_actividades(request):
         else:
             arreglo_parametros = {'estado': parametros[0]}
 
+        #Guardamos los datos a modo de prueba si no pasan posteriores verificaciones se eliminarán
+        try:
+            obj = models.ejercicios(
+                idMaestro=maestro,
+                titulo=titulo,
+                descripcion=descripcion,
+                sInicializacion=sInicializacion,
+                sEntradas=sEntradas,
+                sSalida=sSalida,
+                sParametros=sParametros,
+                sEdoFinal=sEdoFinal,
+                visible=0
+            )
+            obj.save()
+        except Exception as e:
+            print(e)
+        
+        #para el script de inicializacion si fue proporcionado lo ejecutaremos con las credenciales dadas, en el directorio root del
+        #usuario default y retornaremos el resultado de la ejecución
+        if inicializacion[0] == 0:
+            arreglo_inicializacion = ejecutar_inicializacion_maestro(inicializacion, maestro, titulo)
+        else:
+            arreglo_inicializacion = {'estado': inicializacion[0]}
+        
+        print(arreglo_inicializacion)
         contexto = {
             'titulo': titulo,
             'desc': descripcion,
@@ -536,6 +537,7 @@ def ejecutar_inicializacion_maestro(arreglo, maestro, titulo):
                     contenido = archivo.read()
                     
                     #Si p es vacio significa que el comando no regreso ninguna salida estándar y la ejecución fue correcta
+                    print(f'CONTENIDO DE P: {p}')
                     if p == '':
                         #verificar si el archivo tiene código
                         if contenido != '':
@@ -568,7 +570,7 @@ def ejecutar_inicializacion_maestro(arreglo, maestro, titulo):
                         else:
                             return {'estado': 2,'nombre': arreglo[1].name}
                     elif contenido.index('pip'):
-                        install = p 
+                        install = p
                     else:
                         return {'estado': 2,'nombre': arreglo[1].name}
                 elif script[1] == 'sh':

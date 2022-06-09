@@ -444,8 +444,7 @@ def crear_actividades(request):
             arreglo_inicializacion = ejecutar_inicializacion_maestro(inicializacion, maestro, titulo)
         else:
             arreglo_inicializacion = {'estado': inicializacion[0]}
-        
-        print(arreglo_inicializacion)
+            
         contexto = {
             'titulo': titulo,
             'desc': descripcion,
@@ -537,7 +536,6 @@ def ejecutar_inicializacion_maestro(arreglo, maestro, titulo):
                     contenido = archivo.read()
                     
                     #Si p es vacio significa que el comando no regreso ninguna salida estándar y la ejecución fue correcta
-                    print(f'CONTENIDO DE P: {p}')
                     if p == '':
                         #verificar si el archivo tiene código
                         if contenido != '':
@@ -611,7 +609,11 @@ def analizar_parametros(request):
             return render(request, template)
     elif request.method == 'POST':
         if request.POST.get('yes'):
-            print("SE PULSO SI")
+            titulo = request.POST.get('htitle')
+            obj = models.ejercicios.objects.get(titulo = titulo)
+            obj.visible = 1
+            obj.save()
+            return redirect('/crear')
         elif request.POST.get('no'):
             titulo = request.POST.get('htitle')
             obj = models.ejercicios.objects.get(titulo = titulo)

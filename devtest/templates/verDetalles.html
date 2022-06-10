@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+    <title>Actividades - Maestro</title> 
+{% endblock %}
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/barStyles.css' %}">
+    <style>
+        .top {
+            position: absolute;
+            margin: 0;
+            padding: 0;
+        }
+
+        .selected {
+            color: #405fd7;
+        }
+
+        h1 {
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: bolder;
+            font-size: 50px;
+        }
+    
+        table tr td {
+            padding-top: 15px; 
+            width: 100px;        
+        }
+
+        th {
+            border-top-right-radius: 10px;
+            border-top-left-radius: 10px;
+        }
+
+        .tb {
+            text-align: center;
+        }
+
+        .tb table {
+            margin: 0 auto;
+            text-align: center;
+            width: 98%;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+        }
+
+        h4 {
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: bolder;
+            font-size: 22px;
+        }
+    </style>
+{% endblock %}
+{% block scripts %}
+	<script src="{% static 'js/openWindow.js' %}" type="text/javascript"></script>
+    <script src="{% static 'js/stickyBar.js' %}" type="text/javascript"></script>
+{% endblock %}
+{% block header %}
+    <header>
+        <a href="#" class="title">Evaluador Turbo 3000</a>
+        <img class="profile" src="https://cdn-icons-png.flaticon.com/512/4270/4270285.png" alt="docente" width="50" height="50">
+        <div class="menu-icon">
+            <div class="btn-hamburger container-fluid"></div>
+            <div class="btn-hamburger2 container-fluid"></div>
+            <div class="btn-hamburger3 container-fluid"></div>
+        </div>
+        <ul id="tog" class="hide">
+            <li><a href="/docente">Inicio</a></li>
+            <li><a class="selected" href="/crear">Actividades</a></li>
+            <li><a href="/alumnos">Alumnos</a></li>
+            <li><a href="/grupo">Grupo</a></li>
+            <li><a href="/perfil">Perfil</a></li>
+            <li><a href="/logout">Cerrar Sesión</a></li>
+        </ul>
+    </header>
+{% endblock %}
+{% block content %}
+<img class="top" src="https://1.bp.blogspot.com/-f_1AVR6hUEQ/XRy5aYOx1SI/AAAAAAAAGbw/bu2AY_PQ6t0ZdSYxQVxMVeNXelyv9FHPQCLcBGAs/s640/seguridad%2Binfo.jpg" width="100%" height="200" alt="header image">
+<br><br><br><br><br><br><br><br><br>
+<hr size="10" style="color: rgba(15, 10, 222, 1);">
+<hr size="10" style="color: rgba(15, 10, 222, 1);">
+<h1><img src="https://cdn-icons-png.flaticon.com/512/1746/1746673.png" alt="security icon" width="auto" height="50"> {{ grupo }} <img src="https://cdn-icons-png.flaticon.com/512/1746/1746673.png" alt="security icon" width="auto" height="50"></h1>
+<hr size="10" style="color: rgba(15, 10, 222, 1);">
+<div class="tb">
+    <table>
+        <tr>
+            <th bgcolor="#405fd7" colspan="4"><h4>{{ titulo }}</h4></th>
+        </tr>
+        <tr>
+            <th>Nombre</th>
+            <th>Calificación</th>
+            <th>Intentos</th>
+            <th>Resultado</th>
+        </tr>
+        {% for alumno in alumnos %}
+            <tr>
+                <td>{{ alumno.nombre }}</td>
+                {% for ev in evaluacion %}
+                    {% if alumno.id == ev.idAlumno_id %}
+                        {% if ev.calificacion == NULL %}
+                            <td>NA</td>
+                        {% else %}
+                            <td>{{ ev.calificacion }}</td>
+                        {% endif %}
+                        {% if ev.intentos == NULL %}
+                            <td>NA</td>
+                        {% else %}
+                            <td>{{ ev.intentos }}</td>
+                        {% endif %}
+                        {% if ev.resultado == '' %}
+                            <td>NA</td>
+                        {% else %}
+                            <td>{{ ev.resultado }}</td>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

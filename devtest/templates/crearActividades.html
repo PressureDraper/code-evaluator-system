@@ -199,10 +199,26 @@
     .alumnos {
         text-align: center;
     }
+
+    .rcent {
+        text-align: center;
+    }
+
+    .inpsend {
+        width: 115px;
+        border-radius: 50px;
+        background-color: rgba(255, 255, 255, 0.6);
+    }
+
+    .inpsend:hover {
+        color: #009932;
+        background-color: rgba(255, 255, 255, 1);
+    }
 </style>
 {% endblock %}
 {% block scripts %}
 	<script src="{% static 'js/openWindow.js' %}" type="text/javascript"></script>
+    <script src="{% static 'js/stickyBar.js' %}" type="text/javascript"></script>
 {% endblock %}
 {% block header %}
     <header>
@@ -327,6 +343,14 @@
                                     <div class="row">
                                         <h5>Alumnos Calificados</h5>
                                         <h6 class="alumnos">0 / {{ totalum }}</h6>
+                                    </div>
+                                    <div class="row rcent">
+                                        <form action="/crear/" method="POST">
+                                            {% csrf_token %}
+                                            <input type="hidden" value="{{ act.titulo }}" name="titulo2">
+                                            <input type="hidden" value="{{ valor.asignatura }}" name="materia">
+                                            <input class="inpsend" type="submit" name="sendDetails" value="Detalles">
+                                        </form>
                                     </div>
                                 </div>
                             </div>

@@ -28,6 +28,7 @@ urlpatterns = [
     path('grupo/', mostrar_grupo, name = "showgroup"),
     path('actividades/', mostrar_actividades),
     path('crear/', crear_actividades),
+    path('detalles/', ver_detalles),
     path('crear/analisis', analizar_parametros, name = "precheck"),
     path('upload/', uploadFile),
     path('registros/', registros),

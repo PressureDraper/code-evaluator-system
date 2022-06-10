@@ -393,84 +393,100 @@ def crear_actividades(request):
         else:
             return redirect(redirectLogin)
     if request.method == 'POST':
-        #Recuperar datos
-        titulo = request.POST.get('titulo')
-        descripcion = request.POST.get('descripcion')
-        sEntradas = request.FILES.get('entrada')
-        sSalida = request.FILES.get('salida')
-        sInicializacion = request.FILES.get('inicializacion')
-        sEdoFinal = request.FILES.get('estado')
-        sParametros = request.FILES.get('parametros')
+        if request.POST.get('sendForm'):
+            #Recuperar datos
+            titulo = request.POST.get('titulo')
+            descripcion = request.POST.get('descripcion')
+            sEntradas = request.FILES.get('entrada')
+            sSalida = request.FILES.get('salida')
+            sInicializacion = request.FILES.get('inicializacion')
+            sEdoFinal = request.FILES.get('estado')
+            sParametros = request.FILES.get('parametros')
 
-        #Validar extensión de scripts - regresa 0 = todo ok, 1 = vacío, 2 = la extensión o algo no es válido
-        entrada = validar_extension(sEntradas)
-        salida = validar_extension(sSalida)
-        inicializacion = validar_extension(sInicializacion)
-        estado = validar_extension(sEdoFinal)
-        parametros = validar_extension(sParametros)
+            #Validar extensión de scripts - regresa 0 = todo ok, 1 = vacío, 2 = la extensión o algo no es válido
+            entrada = validar_extension(sEntradas)
+            salida = validar_extension(sSalida)
+            inicializacion = validar_extension(sInicializacion)
+            estado = validar_extension(sEdoFinal)
+            parametros = validar_extension(sParametros)
 
-        #Después de validar la extensión, si el archivo es válido, se lee y regresa el contenido en el caso de 
-        #los scripts de entrada y salida, el proceso es diferente para los script de inicializacion, edo y param
-        ventrada = regresar_es(entrada)
-        vsalida = regresar_es(salida)
+            #Después de validar la extensión, si el archivo es válido, se lee y regresa el contenido en el caso de 
+            #los scripts de entrada y salida, el proceso es diferente para los script de inicializacion, edo y param
+            ventrada = regresar_es(entrada)
+            vsalida = regresar_es(salida)
 
-        #Ahora verificamos la correcta estructura del arreglo, los dos posibles resultados son:
-        #1. archivo válido, nombre del archivo, texto sin saltos y por lineas [0, 'nombre.txt', 'texto\ncompleto']
-        #2. archivo inválido o vacío y nombre del archivo [1 o 2, 'nombre.txt']
-        if ventrada[0] == 0:
-            arreglo_entrada = quitar_saltos_vacios(ventrada)
-        else:
-            arreglo_entrada = ventrada
+            #Ahora verificamos la correcta estructura del arreglo, los dos posibles resultados son:
+            #1. archivo válido, nombre del archivo, texto sin saltos y por lineas [0, 'nombre.txt', 'texto\ncompleto']
+            #2. archivo inválido o vacío y nombre del archivo [1 o 2, 'nombre.txt']
+            if ventrada[0] == 0:
+                arreglo_entrada = quitar_saltos_vacios(ventrada)
+            else:
+                arreglo_entrada = ventrada
 
-        if vsalida[0] == 0:
-            arreglo_salida = quitar_saltos_vacios(vsalida)
-        else:
-            arreglo_salida = vsalida
-        
-        if estado[0] == 0:
-            arreglo_estado = leer_sparametros(estado)
-        else:
-            arreglo_estado = {'estado': estado[0]}
+            if vsalida[0] == 0:
+                arreglo_salida = quitar_saltos_vacios(vsalida)
+            else:
+                arreglo_salida = vsalida
+            
+            if estado[0] == 0:
+                arreglo_estado = leer_sparametros(estado)
+            else:
+                arreglo_estado = {'estado': estado[0]}
 
-        if parametros[0] == 0:
-            arreglo_parametros = leer_sparametros(parametros)
-        else:
-            arreglo_parametros = {'estado': parametros[0]}
+            if parametros[0] == 0:
+                arreglo_parametros = leer_sparametros(parametros)
+            else:
+                arreglo_parametros = {'estado': parametros[0]}
 
-        #Guardamos los datos a modo de prueba si no pasan posteriores verificaciones se eliminarán
-        try:
-            obj = models.ejercicios(
-                idMaestro=maestro,
-                titulo=titulo,
-                descripcion=descripcion,
-                sInicializacion=sInicializacion,
-                sEntradas=sEntradas,
-                sSalida=sSalida,
-                sParametros=sParametros,
-                sEdoFinal=sEdoFinal,
-                visible=0
-            )
-            obj.save()
-        except Exception as e:
-            print(e)
-        
-        #para el script de inicializacion si fue proporcionado lo ejecutaremos con las credenciales dadas, en el directorio root del
-        #usuario default y retornaremos el resultado de la ejecución
-        if inicializacion[0] == 0:
-            arreglo_inicializacion = ejecutar_inicializacion_maestro(inicializacion, maestro, titulo)
-        else:
-            arreglo_inicializacion = {'estado': inicializacion[0]}
+            #Guardamos los datos a modo de prueba si no pasan posteriores verificaciones se eliminarán
+            try:
+                obj = models.ejercicios(
+                    idMaestro=maestro,
+                    titulo=titulo,
+                    descripcion=descripcion,
+                    sInicializacion=sInicializacion,
+                    sEntradas=sEntradas,
+                    sSalida=sSalida,
+                    sParametros=sParametros,
+                    sEdoFinal=sEdoFinal,
+                    visible=0
+                )
+                obj.save()
+            except Exception as e:
+                print(e)
+            
+            #para el script de inicializacion si fue proporcionado lo ejecutaremos con las credenciales dadas, en el directorio root del
+            #usuario default y retornaremos el resultado de la ejecución
+            if inicializacion[0] == 0:
+                arreglo_inicializacion = ejecutar_inicializacion_maestro(inicializacion, maestro, titulo)
+            else:
+                arreglo_inicializacion = {'estado': inicializacion[0]}
 
-        contexto = {
-            'titulo': titulo,
-            'desc': descripcion,
-            'entrada': arreglo_entrada,
-            'salida': arreglo_salida,
-            'init': arreglo_inicializacion,
-            'estado': arreglo_estado,
-            'parametros': arreglo_parametros
-            }
-        return render(request, 'analizarParametros.html', contexto)
+            contexto = {
+                'titulo': titulo,
+                'desc': descripcion,
+                'entrada': arreglo_entrada,
+                'salida': arreglo_salida,
+                'init': arreglo_inicializacion,
+                'estado': arreglo_estado,
+                'parametros': arreglo_parametros
+                }
+            return render(request, 'analizarParametros.html', contexto)
+        elif request.POST.get('sendDetails'):
+            titulo = request.POST.get('titulo2')
+            grupo = request.POST.get('materia')
+            alumnos = models.alumnos.objects.filter(idMaestro_id = maestro.id)
+            ejercicio = models.ejercicios.objects.get(titulo = titulo)
+            evaluacion = models.evaluaciones.objects.filter(idEjercicio = ejercicio.id)
+            return render(request, 'verDetalles.html', {'alumnos': alumnos, 'ejercicio': ejercicio, 'evaluacion': evaluacion, 'grupo': grupo, 'titulo': titulo})
+
+def ver_detalles(request):
+    template = 'verDetalles.html'
+    data = request.session.get('cookie_session', '')
+    if data:
+        return render(request, template)
+    else:
+        return redirect(redirectLogin)
 
 def validar_extension(archivo):
     if archivo is None:
@@ -623,6 +639,8 @@ def analizar_parametros(request):
     if request.method == 'GET':
         if data:
             return render(request, template)
+        else:
+            return redirect(redirectLogin)
     elif request.method == 'POST':
         if request.POST.get('yes'):
             titulo = request.POST.get('htitle')

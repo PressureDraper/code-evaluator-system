@@ -33,6 +33,110 @@
         margin: 0;
         padding: 0;
     }
+
+    .eg {
+        padding-top: 120px;
+    }
+
+    .frow {
+        padding: 0;
+        margin: 0;
+        padding-bottom: 10px;
+    }
+
+    .actividad {
+        width: 100%;
+        height: 150px;
+        border-radius: 10px;
+        background-color: rgba(255, 255, 255, 0.6);
+        overflow: hidden;
+    }
+
+    h4 {
+        color: rgba(255, 255, 255, 0.7);
+        text-align: center;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: bolder;
+        font-size: 22px;
+    }
+
+    h5 {
+        text-align: center;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: bolder;
+        font-size: 18px;
+    }
+
+    h6 {
+        padding-left: 10px;
+        text-align: left;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: bolder;
+        font-size: 16px;
+    }
+
+    .alumnos {
+        text-align: center;
+    }
+
+    p {
+        font-family: 'Fredoka', sans-serif;
+        font-weight: bolder;
+        font-size: 14px;
+        padding-bottom: 0;
+        margin-bottom: 0;
+        margin-top: -17px;
+        margin-left: 90px;
+    }
+
+    .tooltiptext {
+        visibility: hidden;
+        margin-left: -375px;
+        width: 350px;
+        background-color: rgba(0, 0, 0, 0.85);
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        font-family: 'Ubuntu', sans-serif;
+        font-size: 14px;
+        padding: 5px 0;
+
+        /* Position the tooltip */
+        position: absolute;
+        z-index: 1;
+    }
+
+    .error:hover {
+        color: red;
+        transition: 0.5s;
+    }
+
+    .error {
+        color: black;
+        transition: 0.5s;
+    }
+
+    .error:hover .tooltiptext{
+        visibility: visible;
+    }
+
+    .inpenv {
+        padding-top: 10px;
+        align-self: center;
+        align-content: center;
+        text-align: center;
+    }
+
+    .inpsend {
+        width: 115px;
+        border-radius: 50px;
+        background-color: rgba(255, 255, 255, 0.6);
+    }
+
+    .inpsend:hover {
+        color: #009932;
+        background-color: rgba(255, 255, 255, 1);
+    }
 </style>
 {% endblock %}
 {% block header %}
@@ -62,7 +166,63 @@
     <h1><img src="https://cdn-icons-png.flaticon.com/512/1746/1746673.png" alt="security icon" width="auto" height="50"> {{ valor.asignatura }} <img src="https://cdn-icons-png.flaticon.com/512/1746/1746673.png" alt="security icon" width="auto" height="50"></h1>
     <hr size="10" style="color: rgba(15, 10, 222, 1);">
         {% if actividades == 1 %}
-        <h1>Hay actividades</h1>
+            {% for act in ejercicios %}
+            <div class="row frow">
+                <div class="col-sm-12">
+                    <div class="actividad">
+                        <div class="row">
+                            <div class="col-sm-5" style="background-color: #405fd7;">
+                                <h4>Actividad: {{ act.titulo }}</h4>
+                            </div>
+                            <div class="col-sm-7" style="background-color: darkgreen;">
+                                <h4>Fecha: {{ act.fecha }}</h4>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h5>Descripción</h5>
+                                <h6>{{ act.descripcion }}</h6>
+                            </div>
+                            <div class="col-sm-3">
+                                <h5>Subir Archivo</h5>
+                                <form action="/actividades/" method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" value="{{ act.titulo }}" name="htitle">
+                                    <input class="form-control form-control-sm" type="file" name="scriptalumno" required>
+                                    <div class="inpenv">
+                                        <input class="inpsend" type="submit" name="sendForm" value="Evaluar">
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-sm-3">
+                                <h5>Calificación</h5>
+                                {% if evaluaciones.calificacion == NULL %}
+                                <h5>NA</h5>
+                                {% else %}
+                                <h5>{{ evaluaciones.calificacion }}</h5>
+                                {% endif %}
+                            </div>
+                            <div class="col-sm-3">
+                                <h5>Intentos
+                                    <p>
+                                        <span class="error">(?)
+                                            <span class="tooltiptext">
+                                                ¡Tienes intentos ilimitados para subir tu ejercicio!<br>
+                                                Pero por cada vez que lo subas después de la primera vez se te restará 0.3 puntos de un total de 10.<br>
+                                            </span>
+                                        </span>
+                                    </p>
+                                </h5>
+                                {% if evaluaciones.intentos == NULL %}
+                                <h5>NA</h5>
+                                {% else %}
+                                <h5>{{ evaluaciones.intentos }}</h5>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         {% elif actividades == 0 %}
         <h2>¡No hay actividades!</h2>
         <div class="empty">
@@ -70,6 +230,9 @@
         </div>
         {% endif %}
     {% elif grupo == 0 %}
-    <h1>No hay grupo</h1>
+    <div class="eg">
+        <h1>¡No has sido agregado a ningún grupo!</h1>
+        <h2>Las actividades aparecerán aquí en cuanto seas agregado</h2>
+    </div>
     {% endif %}
 {% endblock %}

@@ -345,13 +345,19 @@ def mostrar_actividades(request):
                 #Se obtiene el objeto de grupo en donde se encuentra el alumno
                 asignado = models.grupo.objects.get(idMaestro_id = alumno.idMaestro_id)
                 if actividades == True:
-                    return render(request, template, {'grupo': 1, 'actividades': 1, 'valor': asignado, 'activs': actividades})
+                    alumno = models.alumnos.objects.get(usuario = data)
+                    ex = models.ejercicios.objects.filter(idMaestro_id = alumno.idMaestro_id)
+                    ev = models.evaluaciones.objects.filter(idAlumno_id = alumno.id)
+                    return render(request, template, {'grupo': 1, 'actividades': 1, 'valor': asignado, 'activs': actividades, 'ejercicios': ex, 'evaluaciones': ev})
                 elif actividades == False:
                     return render(request, template, {'grupo': 1, 'actividades': 0, 'valor': asignado})
             elif grupo == False:
                 return render(request, template, {'grupo': 0})
         else:
             return redirect(redirectLogin)
+    if request.method == 'POST':
+        print("Método POST")
+        return redirect('/actividades')
 
 def crear_actividades(request):
     template = 'crearActividades.html'
@@ -620,9 +626,22 @@ def analizar_parametros(request):
     elif request.method == 'POST':
         if request.POST.get('yes'):
             titulo = request.POST.get('htitle')
-            obj = models.ejercicios.objects.get(titulo = titulo)
-            obj.visible = 1
-            obj.save()
+            objc = models.ejercicios.objects.get(titulo = titulo)
+            objc.visible = 1
+            objc.save()
+
+            #Se crean las tablas para las evaluaciones de cada alumno dentro del curso
+            maestro = models.maestros.objects.get(usuario = data)
+            alumnos = models.alumnos.objects.filter(idMaestro_id = maestro.id)
+            for alumno in alumnos:
+                try:
+                    obj = models.evaluaciones(
+                        idEjercicio=objc,
+                        idAlumno=alumno
+                    )
+                    obj.save()
+                except Exception as e:
+                    print(e)
             return redirect('/crear')
         elif request.POST.get('no'):
             titulo = request.POST.get('htitle')

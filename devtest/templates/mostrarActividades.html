@@ -41,12 +41,12 @@
     .frow {
         padding: 0;
         margin: 0;
-        padding-bottom: 10px;
+        padding-bottom: 20px;
     }
 
     .actividad {
         width: 100%;
-        height: 150px;
+        height: 170px;
         border-radius: 10px;
         background-color: rgba(255, 255, 255, 0.6);
         overflow: hidden;
@@ -69,10 +69,10 @@
 
     h6 {
         padding-left: 10px;
-        text-align: left;
+        text-align: center;
         font-family: 'Fredoka', sans-serif;
         font-weight: bolder;
-        font-size: 16px;
+        font-size: 15px;
     }
 
     .alumnos {
@@ -111,6 +111,11 @@
         transition: 0.5s;
     }
 
+    .err2 {
+        margin-top: -100px;
+        margin-right: -230px;
+    }
+
     .error {
         color: black;
         transition: 0.5s;
@@ -121,7 +126,7 @@
     }
 
     .inpenv {
-        padding-top: 10px;
+        padding-top: 20px;
         align-self: center;
         align-content: center;
         text-align: center;
@@ -137,10 +142,37 @@
         color: #009932;
         background-color: rgba(255, 255, 255, 1);
     }
+
+    .rdc {
+        color: red;
+    }
+
+    .cnt {
+        text-align: center;
+    }
+
+    .linkc {
+        text-align: center;
+    }
 </style>
 {% endblock %}
 {% block scripts %}
     <script src="{% static 'js/stickyBar.js' %}" type="text/javascript"></script>
+    <script>
+        $(document).ready(function(){
+            $("#btn-regist").click(function() {
+                $(".divform").css("display","none");
+                $(".divform2").css("display","inline");
+            });
+            $("#btn-enviar").click(function() {
+                $("#fg2").submit(function(event) {
+                    if ($("#usr2").val() == "" || $("#pass2").val() == "") {
+                        event.preventDefault();
+                    }
+                });
+            });
+        });
+    </script>
 {% endblock %}
 {% block header %}
     <header>
@@ -181,14 +213,47 @@
                                 <h4>Fecha: {{ act.fecha }}</h4>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-sm-3">
+                        {% if errors == 1 %}
+                        <div class="row" id="hiddn">
+                            <div class="col-sm-12">
+                                <h4 class="rdc">¡Error!</h4>
+                                <h5>Por favor introduce un Script válido.
+                                    <p>
+                                        <span class="error err2">(?)
+                                            <span class="tooltiptext tt2">
+                                                Debe cumplir las siguientes especificaciones:<br>
+                                                1. Extensión .py o .sh<br>
+                                                2. No debe ser un archivo vacío
+                                            </span>
+                                        </span>
+                                    </p>
+                                </h5>
+                                <div class="linkc">
+                                    <a href="/actividades"><input class="inpsend" type="submit" value="Entendido" onclick="changeDiv()"></a>
+                                </div>
+                            </div>
+                        </div>
+                        {% elif errors == 2 %}
+                        <div class="row" id="hiddn">
+                            <div class="col-sm-12">
+                                <h4 class="rdc">¡Huy!</h4>
+                                <h5>Al parecer tu Script no funciona como se esperaba. <img width="auto" height="30" src="https://icons.iconarchive.com/icons/google/noto-emoji-smileys/1024/10032-sad-but-relieved-face-icon.png" alt="sad face"></h5>
+                                <h5>Inténtalo de nuevo.</h5>
+                                <div class="linkc">
+                                    <a href="/actividades"><input class="inpsend" type="submit" value="Entendido" onclick="changeDiv()"></a>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="row" id="shown">
+                            <div class="col-sm-3 col3">
                                 <h5>Descripción</h5>
                                 <h6>{{ act.descripcion }}</h6>
                             </div>
                             <div class="col-sm-3">
                                 <h5>Subir Archivo</h5>
                                 <form action="/actividades/" method="POST" enctype="multipart/form-data">
+                                    {% csrf_token %}
                                     <input type="hidden" value="{{ act.titulo }}" name="htitle">
                                     <input class="form-control form-control-sm" type="file" name="scriptalumno" required>
                                     <div class="inpenv">
@@ -198,11 +263,15 @@
                             </div>
                             <div class="col-sm-3">
                                 <h5>Calificación</h5>
-                                {% if evaluaciones.calificacion == NULL %}
-                                <h5>NA</h5>
-                                {% else %}
-                                <h5>{{ evaluaciones.calificacion }}</h5>
-                                {% endif %}
+                                {% for eva in evaluaciones %}
+                                    {% if eva.idEjercicio_id == act.id %}
+                                        {% if eva.calificacion == None %}
+                                        <h5>NA</h5>
+                                        {% else %}
+                                        <h5>{{ eva.calificacion }}</h5>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
                             </div>
                             <div class="col-sm-3">
                                 <h5>Intentos
@@ -210,18 +279,23 @@
                                         <span class="error">(?)
                                             <span class="tooltiptext">
                                                 ¡Tienes intentos ilimitados para subir tu ejercicio!<br>
-                                                Pero por cada vez que lo subas después de la primera vez se te restará 0.3 puntos de un total de 10.<br>
+                                                Pero por cada vez que lo subas se te restará 0.3 puntos de un total de 10 en caso de ser erróneo.<br>
                                             </span>
                                         </span>
                                     </p>
                                 </h5>
-                                {% if evaluaciones.intentos == NULL %}
-                                <h5>NA</h5>
-                                {% else %}
-                                <h5>{{ evaluaciones.intentos }}</h5>
-                                {% endif %}
+                                {% for eva in evaluaciones %}
+                                    {% if eva.idEjercicio_id == act.id %}
+                                        {% if eva.intentos == None %}
+                                        <h5>NA</h5>
+                                        {% else %}
+                                        <h5>{{ eva.intentos }}</h5>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
                             </div>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>

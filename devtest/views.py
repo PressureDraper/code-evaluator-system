@@ -1,3 +1,4 @@
+from ast import arguments
 import json
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
@@ -348,7 +349,7 @@ def mostrar_actividades(request):
                     alumno = models.alumnos.objects.get(usuario = data)
                     ex = models.ejercicios.objects.filter(idMaestro_id = alumno.idMaestro_id)
                     ev = models.evaluaciones.objects.filter(idAlumno_id = alumno.id)
-                    return render(request, template, {'grupo': 1, 'actividades': 1, 'valor': asignado, 'activs': actividades, 'ejercicios': ex, 'evaluaciones': ev})
+                    return render(request, template, {'grupo': 1, 'actividades': 1, 'valor': asignado, 'activs': actividades, 'ejercicios': ex, 'evaluaciones': ev, 'errors': 0})
                 elif actividades == False:
                     return render(request, template, {'grupo': 1, 'actividades': 0, 'valor': asignado})
             elif grupo == False:
@@ -356,8 +357,154 @@ def mostrar_actividades(request):
         else:
             return redirect(redirectLogin)
     if request.method == 'POST':
-        print("Método POST")
+        #Obtenemos los datos necesarios en caso de redirección de página
+        alumno = models.alumnos.objects.get(usuario = data)
+        asignado = models.grupo.objects.get(idMaestro_id = alumno.idMaestro_id)
+        actividades = models.ejercicios.objects.filter(idMaestro = alumno.idMaestro_id).exists()
+        ex = models.ejercicios.objects.filter(idMaestro_id = alumno.idMaestro_id)
+        ev = models.evaluaciones.objects.filter(idAlumno_id = alumno.id)
+
+        #Obtenemos el script del alumno y hacemos split para verificar extensión, también obtenemos el titulo de la actividad
+        sAlumno = request.FILES.get('scriptalumno')
+        actividad = request.POST.get('htitle') 
+        script = str(sAlumno).split('.')
+
+        #Leemos el contenido para verificar que no sea vacio
+        cont = sAlumno.read()
+
+        if (script[-1] == 'py' or script[-1] == 'sh') and (cont != b''):
+            resultado = evaluar_ejercicio(sAlumno, cont, actividad, data)
+            if resultado == 1:
+                return render(request, template, {'grupo': 1, 'actividades': 1, 'valor': asignado, 'activs': actividades, 'ejercicios': ex, 'evaluaciones': ev, 'errors': 2})
+        else:
+            return render(request, template, {'grupo': 1, 'actividades': 1, 'valor': asignado, 'activs': actividades, 'ejercicios': ex, 'evaluaciones': ev, 'errors': 1})
         return redirect('/actividades')
+
+def indexlist(item, contenido):
+    lst = []
+    "Returns all indexes of an item in a list or a string"
+    for m in re.finditer(item, contenido):
+        lst.append(m)
+    return lst
+
+def evaluar_ejercicio(script, contenido, act, data):
+    calificacion = 10 #Calificacion inicial del estudiante
+    entradas = []
+
+    #Filtramos la actividad por titulo
+    actv = models.ejercicios.objects.get(titulo = act)
+
+    #Si la actividad tiene archivo de inicializacion se realiza lo correspondiente para evaluar el ejercicio
+    if actv.sInicializacion != '':
+        rutarchivo = actv.sInicializacion
+        rutacompletarchivo = BASE_DIR.joinpath('media/' + str(rutarchivo))
+        rutaroot = BASE_DIR.joinpath('environment/')
+        title = re.sub(r"\s+", "", act) #nombre de la carpeta que ejecuta el ejercicio del alumno
+
+        if not os.path.exists(str(rutaroot) + '/' + title): #Si no existe la carpeta entonces procedemos
+            os.makedirs(str(rutaroot) + '/' + title)
+            default_home = str(rutaroot) + '/' + title
+            default_home = default_home.strip()
+            shutil.copy(rutacompletarchivo, default_home)
+
+            os.chdir(str(rutaroot))
+            os.system(f'chmod -R 757 {title}')
+
+            #Se obtiene el nombre del script de inicializacion
+            scriptnme = str(rutarchivo).split('/')
+            scriptnme = scriptnme[-1]
+
+            #Ruta del archivo de inicializacion
+            comando = default_home + '/' + scriptnme
+
+            #Leer archivo inicializacion
+            archivo = open(comando, 'r')
+            conts = archivo.read()
+            archivo.close()
+
+            #Se ejecuta el script de inicializacion en caso de que sea para crear directorios o archivos
+            a = 0
+            try:
+                if conts.index('open(') or conts.index('makedirs'):
+                    command = f'python3 {comando}'
+                    os.system(f'su - default -c "{command}"')
+                    a = 1
+                elif conts.index('pip'):
+                    a = 1
+                elif conts.index('useradd'):
+                    a = 1
+            except:
+                print("Subcadena no encontrada")
+            
+            if a == 1: #Se ejecuto el script de inicialización y podemos seguir
+                # Verificamos si es un script que se le tiene que pasar parámetros
+                cont = contenido.decode('utf-8')
+                if cont.index('sys.argv'):
+                    #Obtenemos el número de parámetros totales del script del estudiante
+                    lst = indexlist('sys.argv', cont)
+                    last = lst[-1]
+                    substring = cont[last.start():last.end()+3]
+                    args = substring.split('[')
+                    args = args[-1].split(']')
+                    arguments_st = int(args[0])
+                    
+                    #Obtenemos el número de parámetros de las entradas de prueba
+                    rutaen = actv.sEntradas
+                    rutacompletaen = BASE_DIR.joinpath('media/' + str(rutaen))
+                    file = open(rutacompletaen, 'r')
+                    ent = file.readlines()
+                    file.close()
+                    for entrada in ent:
+                        a = entrada.rstrip()
+                        entradas.append(a)
+                    entry = entradas[0].split(' ')
+                    arguments_te = len(entry)
+                else:
+                    print('Es un script sin parametros')
+                
+                if arguments_st == arguments_te: #Si los argumentos de las entradas son iguales a las que requiere el script del alumno seguimos
+                    print('Seguimos')
+                else:
+                    #Borramos la carpeta temporal de la ejecución del script si existe
+                    if os.path.exists(str(rutaroot) + '/' + title):
+                        emptyornot = os.listdir(str(rutaroot) + '/' + title)
+                        if emptyornot == 0:
+                            command = 'rmdir ' + str(rutaroot) + '/' + title
+                            os.system(f'su - default -c "{command}"')
+                        else:
+                            command = 'rm -r ' + str(rutaroot) + '/' + title
+                            os.system(f'su - default -c "{command}"')
+                    
+                    #Sumamos el intento erróneo
+                    alumno = models.alumnos.objects.get(usuario = data)
+                    ejercicio = models.evaluaciones.objects.get(idAlumno = alumno.id)
+                    if ejercicio.intentos == None:
+                        # cal = calificacion - 0.3
+                        ejercicio.intentos = 1
+                        # ejercicio.calificacion = cal
+                        ejercicio.save()
+                    else:
+                        # cal = ejercicio.calificacion - 0.3
+                        inten = ejercicio.intentos + 1
+                        ejercicio.intentos = inten
+                        # ejercicio.calificacion = cal
+                        ejercicio.save()
+                    return 1
+            else:
+                print("Error, no es un script de inicialización")
+
+            #Borramos la carpeta temporal de la ejecución del script
+            if os.path.exists(str(rutaroot) + '/' + title):
+                emptyornot = os.listdir(str(rutaroot) + '/' + title)
+                if emptyornot == 0:
+                    command = 'rmdir ' + str(rutaroot) + '/' + title
+                    os.system(f'su - default -c "{command}"')
+                else:
+                    command = 'rm -r ' + str(rutaroot) + '/' + title
+                    os.system(f'su - default -c "{command}"')
+    else:
+    # print(contenido.decode('utf-8'))
+        pass
 
 def crear_actividades(request):
     template = 'crearActividades.html'
@@ -462,6 +609,7 @@ def crear_actividades(request):
             else:
                 arreglo_inicializacion = {'estado': inicializacion[0]}
 
+            print(arreglo_inicializacion)
             contexto = {
                 'titulo': titulo,
                 'desc': descripcion,
@@ -534,6 +682,11 @@ def ejecutar_inicializacion_maestro(arreglo, maestro, titulo):
             #usuario default que ejecutará el script
             obj = models.ejercicios.objects.get(titulo = titulo, idMaestro_id=maestro.id)
             rutarchivo = obj.sInicializacion
+
+            #Se obtiene el nombre actualizado del script en caso de que haya cambiado
+            scriptnme = str(rutarchivo).split('/')
+            scriptnme = scriptnme[-1]
+
             rutacompletarchivo = BASE_DIR.joinpath('media/' + str(rutarchivo))
             rutaroot = BASE_DIR.joinpath('environment/')
 
@@ -559,13 +712,14 @@ def ejecutar_inicializacion_maestro(arreglo, maestro, titulo):
                     os.chdir(str(rutaroot))
                     os.system(f'chmod -R 757 {title}')
 
-                    comando = default_home + '/' + scriptname
+                    comando = default_home + '/' + scriptnme
                     command = f'python3 {comando}'
                     p = os.popen(f'su - default -c "{command}"').read()
 
                     #Leer archivo
                     archivo = open(comando, 'r')
                     contenido = archivo.read()
+                    archivo.close()
                     
                     #Si p es vacio significa que el comando no regreso ninguna salida estándar y la ejecución fue correcta
                     if p == '':

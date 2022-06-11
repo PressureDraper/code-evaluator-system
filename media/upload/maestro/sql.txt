@@ -1,3 +1,0 @@
-update modelo_alumnos set idMaestro_id = NULL where id = 19;
-
-delete from modelo_grupo where id = 5;

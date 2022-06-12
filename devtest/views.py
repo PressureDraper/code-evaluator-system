@@ -110,7 +110,6 @@ def get_usuario(email):
 
 def post_enviar(usuario, user, passwd):
     if usuario == True:
-        print(f'{user} es Alumno')
         if models.alumnos.objects.get(usuario = user):
             #obtener el objeto completo de la consulta
             obj = models.alumnos.objects.get(usuario = user)
@@ -124,7 +123,6 @@ def post_enviar(usuario, user, passwd):
             print(f'El usuario {usuario} no se encuentra en la base de datos.')
             return redirect(redirectLogin)
     else:
-        print(f'{user} es Maestro')
         if models.maestros.objects.get(usuario = user):
             #obtener el objeto completo de la consulta
             obj = models.maestros.objects.get(usuario = user)
@@ -278,7 +276,6 @@ def mostrar_perfil(request):
     if request.method == 'GET':
         if data:
             user = identificar(data.lower())
-            print(user)
             if user == True: #Si es alumno
                 obj = models.alumnos.objects.get(usuario = data)
                 nombre = obj.nombre
@@ -375,8 +372,10 @@ def mostrar_actividades(request):
             resultado = evaluar_ejercicio(sAlumno, cont, actividad, data)
             if resultado == 1:
                 return render(request, template, {'grupo': 1, 'actividades': 1, 'valor': asignado, 'activs': actividades, 'ejercicios': ex, 'evaluaciones': ev, 'titulo': actividad, 'errors': 2})
+            elif resultado == 0:
+                return render(request, template, {'grupo': 1, 'actividades': 1, 'valor': asignado, 'activs': actividades, 'ejercicios': ex, 'evaluaciones': ev, 'titulo': actividad, 'errors': 0})
         else:
-            return render(request, template, {'grupo': 1, 'actividades': 1, 'valor': asignado, 'activs': actividades, 'ejercicios': ex, 'evaluaciones': ev, 'errors': 1})
+            return render(request, template, {'grupo': 1, 'actividades': 1, 'valor': asignado, 'activs': actividades, 'ejercicios': ex, 'evaluaciones': ev, 'titulo': actividad, 'errors': 1})
         return redirect('/actividades')
 
 def indexlist(item, contenido):
@@ -399,6 +398,14 @@ def evaluar_ejercicio(script, contenido, act, data):
         rutacompletarchivo = BASE_DIR.joinpath('media/' + str(rutarchivo))
         rutaroot = BASE_DIR.joinpath('environment/')
         title = re.sub(r"\s+", "", act) #nombre de la carpeta que ejecuta el ejercicio del alumno
+
+        #Verficamos si ya hay calificacion existente, si la hay se ignora la ejecución
+        alumno = models.alumnos.objects.get(usuario = data)
+        actt = models.ejercicios.objects.get(titulo = act)
+        ejercicio = models.evaluaciones.objects.get(idAlumno = alumno.id, idEjercicio = actt.id)
+
+        if ejercicio.calificacion != None:
+            return 0
 
         if not os.path.exists(str(rutaroot) + '/' + title): #Si no existe la carpeta entonces procedemos
             os.makedirs(str(rutaroot) + '/' + title)
@@ -433,6 +440,17 @@ def evaluar_ejercicio(script, contenido, act, data):
                 elif conts.index('useradd'):
                     a = 1
             except:
+                #Borramos la carpeta temporal de la ejecución del script si existe
+                if os.path.exists(str(rutaroot) + '/' + title):
+                    rout = str(rutaroot) + '/' + title
+                    os.system(f'chmod -R 757 {rout}')
+                    emptyornot = os.listdir(str(rutaroot) + '/' + title)
+                    if emptyornot == 0:
+                        command = 'rmdir ' + str(rutaroot) + '/' + title
+                        os.system(f'su - default -c "{command}"')
+                    else:
+                        command = 'rm -r ' + str(rutaroot) + '/' + title
+                        os.system(f'su - default -c "{command}"')
                 print("Subcadena no encontrada")
             
             if a == 1: #Se ejecuto el script de inicialización y podemos seguir
@@ -535,7 +553,7 @@ def evaluar_ejercicio(script, contenido, act, data):
                         res = p.strip()
                         resa.append(res)
                         command = reset
-                    
+
                     #Teniendo la(s) respuesta(s) ahora la(s) comprobamos con el script de salida
                     objs = models.ejercicios.objects.get(titulo = act, id = actt.id)
                     rutaSalida = BASE_DIR.joinpath('media/' + str(objs.sSalida))
@@ -554,7 +572,112 @@ def evaluar_ejercicio(script, contenido, act, data):
                     
                     #Verificamos que haya sido exitoso el match de las salidas
                     if t != 0:
-                        print('Si pasó')
+                        #Si paso entonces ahora comprobamos el script de estado final si es exitoso
+                        sedo = models.ejercicios.objects.get(titulo = act)
+                        rutaedofinal = BASE_DIR.joinpath('media/' + str(sedo.sEdoFinal))
+                        #Copiamos el script al entorno de ejecución
+                        shutil.copy(rutaedofinal, default_home)
+
+                        scrp = str(sedo.sEdoFinal).split('/')
+                        scrp = scrp[-1]
+
+                        comando = default_home + '/' + scrp
+                        command = f'python3 {comando}'
+                        # os.system(f'chmod 757 {comando}')
+                        p = os.popen(f'su - default -c "{command}"').read()
+                        
+                        #Comprobamos la salida del script de estado final
+                        salida = int(p.strip())
+                        if salida == 1:
+                            gres = ''
+                            #Sumamos el intento correcto
+                            alumno = models.alumnos.objects.get(usuario = data)
+                            actt = models.ejercicios.objects.get(titulo = act)
+                            ejercicio = models.evaluaciones.objects.get(idAlumno = alumno.id, idEjercicio = actt.id)
+                            if ejercicio.intentos == None:
+                                # cal = calificacion - 0.3
+                                ejercicio.intentos = 1
+                                ejercicio.calificacion = calificacion
+                                
+
+                                #Guardamos el o los resultados
+                                for r in resa:
+                                    if r != resa[-1]:
+                                        gres = gres + r + '\n'
+                                    else:
+                                        gres = gres + r
+
+                                ejercicio.resultado = gres
+                                ejercicio.save()
+
+                                #Borramos la carpeta temporal de la ejecución del script
+                                if os.path.exists(str(rutaroot) + '/' + title):
+                                    rout = str(rutaroot) + '/' + title
+                                    os.system(f'chmod -R 757 {rout}')
+                                    emptyornot = os.listdir(str(rutaroot) + '/' + title)
+                                    if emptyornot == 0:
+                                        command = 'rmdir ' + str(rutaroot) + '/' + title
+                                        os.system(f'su - default -c "{command}"')
+                                    else:
+                                        command = 'rm -r ' + str(rutaroot) + '/' + title
+                                        os.system(f'su - default -c "{command}"')
+                            else:
+                                resta = ejercicio.intentos * 0.3
+                                inten = ejercicio.intentos + 1
+                                ejercicio.intentos = inten
+                                ejercicio.calificacion = calificacion - resta
+
+                                #Guardamos el o los resultados
+                                for r in resa:
+                                    if r != resa[-1]:
+                                        gres = gres + r + '\n'
+                                    else:
+                                        gres = gres + r
+                                
+                                ejercicio.resultado = gres
+                                ejercicio.save()
+
+                                #Borramos la carpeta temporal de la ejecución del script
+                                if os.path.exists(str(rutaroot) + '/' + title):
+                                    rout = str(rutaroot) + '/' + title
+                                    os.system(f'chmod -R 757 {rout}')
+                                    emptyornot = os.listdir(str(rutaroot) + '/' + title)
+                                    if emptyornot == 0:
+                                        command = 'rmdir ' + str(rutaroot) + '/' + title
+                                        os.system(f'su - default -c "{command}"')
+                                    else:
+                                        command = 'rm -r ' + str(rutaroot) + '/' + title
+                                        os.system(f'su - default -c "{command}"')
+                            return 0
+                        else:
+                            #Borramos la carpeta temporal de la ejecución del script si existe
+                            if os.path.exists(str(rutaroot) + '/' + title):
+                                rout = str(rutaroot) + '/' + title
+                                os.system(f'chmod -R 757 {rout}')
+                                emptyornot = os.listdir(str(rutaroot) + '/' + title)
+                                if emptyornot == 0:
+                                    command = 'rmdir ' + str(rutaroot) + '/' + title
+                                    os.system(f'su - default -c "{command}"')
+                                else:
+                                    command = 'rm -r ' + str(rutaroot) + '/' + title
+                                    os.system(f'su - default -c "{command}"')
+                            
+                            #Sumamos el intento erróneo
+                            alumno = models.alumnos.objects.get(usuario = data)
+                            actt = models.ejercicios.objects.get(titulo = act)
+                            ejercicio = models.evaluaciones.objects.get(idAlumno = alumno.id, idEjercicio = actt.id)
+                            if ejercicio.intentos == None:
+                                # cal = calificacion - 0.3
+                                ejercicio.intentos = 1
+                                # ejercicio.calificacion = cal
+                                ejercicio.save()
+                            else:
+                                # cal = ejercicio.calificacion - 0.3
+                                inten = ejercicio.intentos + 1
+                                ejercicio.intentos = inten
+                                # ejercicio.calificacion = cal
+                                ejercicio.save()
+                            return 1
                     else:
                         #Borramos la carpeta temporal de la ejecución del script si existe
                         if os.path.exists(str(rutaroot) + '/' + title):
@@ -616,7 +739,7 @@ def evaluar_ejercicio(script, contenido, act, data):
             else:
                 print("Error, no es un script de inicialización")
 
-            #Borramos la carpeta temporal de la ejecución del script
+            # Borramos la carpeta temporal de la ejecución del script
             if os.path.exists(str(rutaroot) + '/' + title):
                 rout = str(rutaroot) + '/' + title
                 os.system(f'chmod -R 757 {rout}')
@@ -628,9 +751,16 @@ def evaluar_ejercicio(script, contenido, act, data):
                     command = 'rm -r ' + str(rutaroot) + '/' + title
                     os.system(f'su - default -c "{command}"')
     else: #Si la actividad no tiene script de inicialización
-        print('NO TIENE')
         rutaroot = BASE_DIR.joinpath('environment/')
         title = re.sub(r"\s+", "", act) #nombre de la carpeta que ejecuta el ejercicio del alumno
+
+        #Verficamos si ya hay calificacion existente, si la hay se ignora la ejecución
+        alumno = models.alumnos.objects.get(usuario = data)
+        actt = models.ejercicios.objects.get(titulo = act)
+        ejercicio = models.evaluaciones.objects.get(idAlumno = alumno.id, idEjercicio = actt.id)
+
+        if ejercicio.calificacion != None:
+            return 0
 
         if not os.path.exists(str(rutaroot) + '/' + title): #Si no existe la carpeta entonces procedemos
             os.makedirs(str(rutaroot) + '/' + title)
@@ -754,12 +884,70 @@ def evaluar_ejercicio(script, contenido, act, data):
                         if b.strip() == a.strip():
                             t = t + 1
                     if a.strip() == txts.strip(): #Si no es ninguna linea entonces es el texto completo
-                        print('LINEAJEJE2')
                         t = t + 1
                 
                 #Verificamos que haya sido exitoso el match de las salidas
                 if t != 0:
-                    print('Si pasó')
+                    gres = ''
+                    #Sumamos el intento correcto
+                    alumno = models.alumnos.objects.get(usuario = data)
+                    actt = models.ejercicios.objects.get(titulo = act)
+                    ejercicio = models.evaluaciones.objects.get(idAlumno = alumno.id, idEjercicio = actt.id)
+                    if ejercicio.intentos == None:
+                        # cal = calificacion - 0.3
+                        ejercicio.intentos = 1
+                        ejercicio.calificacion = calificacion
+                        
+
+                        #Guardamos el o los resultados
+                        for r in resa:
+                            if r != resa[-1]:
+                                gres = gres + r + '\n'
+                            else:
+                                gres = gres + r
+
+                        ejercicio.resultado = gres
+                        ejercicio.save()
+
+                        #Borramos la carpeta temporal de la ejecución del script
+                        if os.path.exists(str(rutaroot) + '/' + title):
+                            rout = str(rutaroot) + '/' + title
+                            os.system(f'chmod -R 757 {rout}')
+                            emptyornot = os.listdir(str(rutaroot) + '/' + title)
+                            if emptyornot == 0:
+                                command = 'rmdir ' + str(rutaroot) + '/' + title
+                                os.system(f'su - default -c "{command}"')
+                            else:
+                                command = 'rm -r ' + str(rutaroot) + '/' + title
+                                os.system(f'su - default -c "{command}"')
+                    else:
+                        resta = ejercicio.intentos * 0.3
+                        inten = ejercicio.intentos + 1
+                        ejercicio.intentos = inten
+                        ejercicio.calificacion = calificacion - resta
+
+                        #Guardamos el o los resultados
+                        for r in resa:
+                            if r != resa[-1]:
+                                gres = gres + r + '\n'
+                            else:
+                                gres = gres + r
+                        
+                        ejercicio.resultado = gres
+                        ejercicio.save()
+
+                        #Borramos la carpeta temporal de la ejecución del script
+                        if os.path.exists(str(rutaroot) + '/' + title):
+                            rout = str(rutaroot) + '/' + title
+                            os.system(f'chmod -R 757 {rout}')
+                            emptyornot = os.listdir(str(rutaroot) + '/' + title)
+                            if emptyornot == 0:
+                                command = 'rmdir ' + str(rutaroot) + '/' + title
+                                os.system(f'su - default -c "{command}"')
+                            else:
+                                command = 'rm -r ' + str(rutaroot) + '/' + title
+                                os.system(f'su - default -c "{command}"')
+                    return 0
                 else:
                     #Borramos la carpeta temporal de la ejecución del script si existe
                     if os.path.exists(str(rutaroot) + '/' + title):
@@ -818,18 +1006,6 @@ def evaluar_ejercicio(script, contenido, act, data):
                     # ejercicio.calificacion = cal
                     ejercicio.save()
                 return 1
-            
-            #Borramos la carpeta temporal de la ejecución del script
-            if os.path.exists(str(rutaroot) + '/' + title):
-                rout = str(rutaroot) + '/' + title
-                os.system(f'chmod -R 757 {rout}')
-                emptyornot = os.listdir(str(rutaroot) + '/' + title)
-                if emptyornot == 0:
-                    command = 'rmdir ' + str(rutaroot) + '/' + title
-                    os.system(f'su - default -c "{command}"')
-                else:
-                    command = 'rm -r ' + str(rutaroot) + '/' + title
-                    os.system(f'su - default -c "{command}"')
 
 def obtener_argumentos(args):
     arg = []
@@ -934,7 +1110,6 @@ def crear_actividades(request):
                 obj.save()
             except Exception as e:
                 print(e)
-            
             #para el script de inicializacion si fue proporcionado lo ejecutaremos con las credenciales dadas, en el directorio root del
             #usuario default y retornaremos el resultado de la ejecución
             if inicializacion[0] == 0:
@@ -942,7 +1117,6 @@ def crear_actividades(request):
             else:
                 arreglo_inicializacion = {'estado': inicializacion[0]}
 
-            print(arreglo_inicializacion)
             contexto = {
                 'titulo': titulo,
                 'desc': descripcion,
@@ -1200,7 +1374,6 @@ def uploadFile(request):
             # Fetching the form data
             fileTitle = request.POST.get("fileTitle")
             file = request.FILES.get("file")
-            # print(file) #Regresa el nombre del archivo
 
             # Saving the information in the database
             document = models.testfiles(title = fileTitle, uploaded = file)

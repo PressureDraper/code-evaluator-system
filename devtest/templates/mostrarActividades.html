@@ -154,6 +154,17 @@
     .linkc {
         text-align: center;
     }
+
+    .centerarea {
+        text-align: center;
+    }
+
+    textarea {
+        outline: none;
+        border: none;
+        resize: none;
+        background-color: rgba(255, 255, 255, 0);
+    }
 </style>
 {% endblock %}
 {% block scripts %}
@@ -214,25 +225,78 @@
                             </div>
                         </div>
                         {% if errors == 1 %}
-                        <div class="row" id="hiddn">
-                            <div class="col-sm-12">
-                                <h4 class="rdc">¡Error!</h4>
-                                <h5>Por favor introduce un Script válido.
-                                    <p>
-                                        <span class="error err2">(?)
-                                            <span class="tooltiptext tt2">
-                                                Debe cumplir las siguientes especificaciones:<br>
-                                                1. Extensión .py o .sh<br>
-                                                2. No debe ser un archivo vacío
+                            {% if titulo == act.titulo %}
+                            <div class="row" id="hiddn">
+                                <div class="col-sm-12">
+                                    <h4 class="rdc">¡Error!</h4>
+                                    <h5>Por favor introduce un Script válido.
+                                        <p>
+                                            <span class="error err2">(?)
+                                                <span class="tooltiptext tt2">
+                                                    Debe cumplir las siguientes especificaciones:<br>
+                                                    1. Extensión .py o .sh<br>
+                                                    2. No debe ser un archivo vacío
+                                                </span>
                                             </span>
-                                        </span>
-                                    </p>
-                                </h5>
-                                <div class="linkc">
-                                    <a href="/actividades"><input class="inpsend" type="submit" value="Entendido" onclick="changeDiv()"></a>
+                                        </p>
+                                    </h5>
+                                    <div class="linkc">
+                                        <a href="/actividades"><input class="inpsend" type="submit" value="Entendido" onclick="changeDiv()"></a>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                            {% else %}
+                            <div class="row" id="shown">
+                                <div class="col-sm-3 col3">
+                                    <h5>Descripción</h5>
+                                    <h6>{{ act.descripcion }}</h6>
+                                </div>
+                                <div class="col-sm-3">
+                                    <h5>Subir Archivo</h5>
+                                    <form action="/actividades/" method="POST" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <input type="hidden" value="{{ act.titulo }}" name="htitle">
+                                        <input class="form-control form-control-sm wdt" type="file" name="scriptalumno" required>
+                                        <div class="inpenv">
+                                            <input class="inpsend" type="submit" name="sendForm" value="Evaluar">
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="col-sm-3">
+                                    <h5>Calificación</h5>
+                                    {% for eva in evaluaciones %}
+                                        {% if eva.idEjercicio_id == act.id %}
+                                            {% if eva.calificacion == None %}
+                                            <h5>NA</h5>
+                                            {% else %}
+                                            <h5>{{ eva.calificacion }}</h5>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <div class="col-sm-3">
+                                    <h5>Intentos
+                                        <p>
+                                            <span class="error">(?)
+                                                <span class="tooltiptext">
+                                                    ¡Tienes intentos ilimitados para subir tu ejercicio!<br>
+                                                    Pero por cada vez que lo subas se te restará 0.3 puntos de un total de 10 en caso de ser erróneo.<br>
+                                                </span>
+                                            </span>
+                                        </p>
+                                    </h5>
+                                    {% for eva in evaluaciones %}
+                                        {% if eva.idEjercicio_id == act.id %}
+                                            {% if eva.intentos == None %}
+                                            <h5>NA</h5>
+                                            {% else %}
+                                            <h5>{{ eva.intentos }}</h5>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
                         {% elif errors == 2 %}
                             {% if titulo == act.titulo %}
                             <div class="row" id="hiddn">
@@ -301,7 +365,9 @@
                         <div class="row" id="shown">
                             <div class="col-sm-3 col3">
                                 <h5>Descripción</h5>
-                                <h6>{{ act.descripcion }}</h6>
+                                <div class="centerarea">
+                                    <textarea readonly name="texta"cols="36" rows="4">{{ act.descripcion }}</textarea>
+                                </div>
                             </div>
                             <div class="col-sm-3">
                                 <h5>Subir Archivo</h5>

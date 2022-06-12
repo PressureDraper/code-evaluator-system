@@ -43,7 +43,7 @@ class grupo(models.Model):
 class ejercicios(models.Model):
     idMaestro = models.ForeignKey(maestros, on_delete=models.CASCADE)
     titulo = models.CharField(max_length = 254)
-    descripcion = models.CharField(max_length = 254)
+    descripcion = models.TextField(blank=True)
     fecha = models.DateTimeField(auto_now = True)
     sInicializacion = models.FileField(upload_to = "upload/maestro", blank=True)
     sEntradas = models.FileField(upload_to = "upload/maestro", blank=True)

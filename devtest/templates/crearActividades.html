@@ -206,6 +206,7 @@
 
     .rcent {
         text-align: center;
+        margin-top: 40px;
     }
 
     .inpsend {
@@ -217,6 +218,17 @@
     .inpsend:hover {
         color: #009932;
         background-color: rgba(255, 255, 255, 1);
+    }
+
+    .centerarea {
+        text-align: center;
+    }
+
+    .txta {
+        outline: none;
+        border: none;
+        resize: none;
+        background-color: rgba(255, 255, 255, 0);
     }
 </style>
 {% endblock %}
@@ -323,7 +335,9 @@
                             <div class="row">
                                 <div class="col-sm-4">
                                     <h5>Descripción</h5>
-                                    <h6>{{ act.descripcion }}</h6>
+                                    <div class="centerarea">
+                                        <textarea class="txta" readonly name="texta"cols="50" rows="3">{{ act.descripcion }}</textarea>
+                                    </div>
                                 </div>
                                 <div class="col-sm-4">
                                 <h5>Scripts Proporcionados</h5>
@@ -344,10 +358,10 @@
                                     {% endif %}
                                 </div>
                                 <div class="col-sm-4">
-                                    <div class="row">
+                                    <!-- <div class="row">
                                         <h5>Alumnos Calificados</h5>
-                                        <h6 class="alumnos">0 / {{ totalum }}</h6>
-                                    </div>
+                                        <h6 class="alumnos">{{ calif }} / {{ totalum }}</h6>
+                                    </div> -->
                                     <div class="row rcent">
                                         <form action="/crear/" method="POST">
                                             {% csrf_token %}

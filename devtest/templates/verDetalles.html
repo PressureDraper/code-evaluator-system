@@ -114,7 +114,7 @@
                         {% if ev.resultado == '' %}
                             <td>NA</td>
                         {% else %}
-                            <td>{{ ev.resultado }}</td>
+                            <td>{{ ev.resultado|linebreaks }}</td>
                         {% endif %}
                     {% endif %}
                 {% endfor %}

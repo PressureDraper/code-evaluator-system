@@ -234,16 +234,69 @@
                             </div>
                         </div>
                         {% elif errors == 2 %}
-                        <div class="row" id="hiddn">
-                            <div class="col-sm-12">
-                                <h4 class="rdc">¡Huy!</h4>
-                                <h5>Al parecer tu Script no funciona como se esperaba. <img width="auto" height="30" src="https://icons.iconarchive.com/icons/google/noto-emoji-smileys/1024/10032-sad-but-relieved-face-icon.png" alt="sad face"></h5>
-                                <h5>Inténtalo de nuevo.</h5>
-                                <div class="linkc">
-                                    <a href="/actividades"><input class="inpsend" type="submit" value="Entendido" onclick="changeDiv()"></a>
+                            {% if titulo == act.titulo %}
+                            <div class="row" id="hiddn">
+                                <div class="col-sm-12">
+                                    <h4 class="rdc">¡Huy!</h4>
+                                    <h5>Al parecer tu Script no funciona como se esperaba. <img width="auto" height="30" src="https://icons.iconarchive.com/icons/google/noto-emoji-smileys/1024/10032-sad-but-relieved-face-icon.png" alt="sad face"></h5>
+                                    <h5>Inténtalo de nuevo.</h5>
+                                    <div class="linkc">
+                                        <a href="/actividades"><input class="inpsend" type="submit" value="Entendido" onclick="changeDiv()"></a>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                            {% else %}
+                            <div class="row" id="shown">
+                                <div class="col-sm-3 col3">
+                                    <h5>Descripción</h5>
+                                    <h6>{{ act.descripcion }}</h6>
+                                </div>
+                                <div class="col-sm-3">
+                                    <h5>Subir Archivo</h5>
+                                    <form action="/actividades/" method="POST" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <input type="hidden" value="{{ act.titulo }}" name="htitle">
+                                        <input class="form-control form-control-sm" type="file" name="scriptalumno" required>
+                                        <div class="inpenv">
+                                            <input class="inpsend" type="submit" name="sendForm" value="Evaluar">
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="col-sm-3">
+                                    <h5>Calificación</h5>
+                                    {% for eva in evaluaciones %}
+                                        {% if eva.idEjercicio_id == act.id %}
+                                            {% if eva.calificacion == None %}
+                                            <h5>NA</h5>
+                                            {% else %}
+                                            <h5>{{ eva.calificacion }}</h5>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <div class="col-sm-3">
+                                    <h5>Intentos
+                                        <p>
+                                            <span class="error">(?)
+                                                <span class="tooltiptext">
+                                                    ¡Tienes intentos ilimitados para subir tu ejercicio!<br>
+                                                    Pero por cada vez que lo subas se te restará 0.3 puntos de un total de 10 en caso de ser erróneo.<br>
+                                                </span>
+                                            </span>
+                                        </p>
+                                    </h5>
+                                    {% for eva in evaluaciones %}
+                                        {% if eva.idEjercicio_id == act.id %}
+                                            {% if eva.intentos == None %}
+                                            <h5>NA</h5>
+                                            {% else %}
+                                            <h5>{{ eva.intentos }}</h5>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
                         {% else %}
                         <div class="row" id="shown">
                             <div class="col-sm-3 col3">

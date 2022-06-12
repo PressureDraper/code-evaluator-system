@@ -57,5 +57,5 @@ class evaluaciones(models.Model):
     idAlumno = models.ForeignKey(alumnos, on_delete=models.CASCADE)
     script = models.FileField(upload_to = "upload/alumno", blank=True)
     resultado = models.CharField(max_length = 254, blank=True)
-    calificacion = models.IntegerField(blank=True, null=True)
+    calificacion = models.FloatField(blank=True, null=True)
     intentos = models.IntegerField(blank=True, null=True)

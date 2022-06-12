@@ -1,0 +1,2 @@
+Hola omar, tu edad es 21
+Hola jose, tu edad es 35

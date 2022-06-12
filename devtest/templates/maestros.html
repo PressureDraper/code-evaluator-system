@@ -9,6 +9,52 @@
         .selected {
             color: #405fd7;
         }
+        
+        .noscript {
+            position: absolute;
+            background-color: white;
+            height: 100%;
+            width: 100%;
+            z-index: 100;
+        }
+
+        .carousel-fade .carousel-item {
+			opacity: 0;
+			transition-duration: .6s;
+			transition-property: opacity;
+		}
+
+		.carousel-fade .carousel-item.active,
+		.carousel-fade .carousel-item-next.carousel-item-left,
+		.carousel-fade .carousel-item-prev.carousel-item-right {
+			opacity: 1;
+		}
+
+		.carousel-fade .active.carousel-item-left,
+		.carousel-fade .active.carousel-item-right {
+			opacity: 0;
+		}
+
+		.carousel-fade .carousel-item-next,
+		.carousel-fade .carousel-item-prev,
+		.carousel-fade .carousel-item.active,
+		.carousel-fade .active.carousel-item-left,
+		.carousel-fade .active.carousel-item-prev {
+			transform: translateX(0);
+			transform: translate3d(0, 0, 0);
+		}
+
+		h3 {
+			color: darkgreen;
+		}
+
+		span {
+			color: black;
+		}
+
+        .padt {
+            padding-top: 8%;
+        }
     </style>
 {% endblock %}
 {% block header %}
@@ -29,6 +75,57 @@
             <li><a href="/logout">Cerrar Sesión</a></li>
         </ul>
     </header>
+    <noscript>
+        <div class="noscript">
+            <strong>Lo sentimos pero esta página no puede trabajar bien sin JavaScript. Porfavor habilítalo para continuar.</strong>
+        </div>
+    </noscript>
+{% endblock %}
+{% block content %}
+<div class="bg-primary text-white rounded text-center bg-dark padt">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/8/8f/Logo_de_la_Universidad_Veracruzana.svg" width="auto" height="100px">
+    <h1>Universidad Veracruzana</h1>
+</div>
+<div class="p-2 text-white rounded text-center caru">
+    <!-- Carousel -->
+    <div id="demo" class="carousel slide carousel-dark carousel-fade" data-bs-ride="carousel">
+        <!-- Indicators/dots -->
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#demo" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#demo" data-bs-slide-to="2"></button>
+        </div>
+        <!-- The slideshow/carousel -->
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <a href="https://www.uv.mx/fei/general/estudiante-de-redes-y-servicios-de-computo/">
+                    <img src="https://www.uv.mx/fei/files/2021/10/ArtRedes-1600x550.png" alt="Chicago" class="d-block" style="width:100%">
+                </a>
+            </div>
+            <div class="carousel-item">
+                <a href="https://www.uv.mx/fei/general/avisos-experiencias-educativas-vacantes-temporales-ago21-ene22/">
+                    <img src="https://www.uv.mx/fei/files/2021/08/Resultados020921-1600x550.png" alt="Chicago" class="d-block" style="width:100%">
+                </a>
+            </div>
+            <div class="carousel-item">
+                <a href="https://www.uv.mx/fei/general/entrega-de-notas-laudatorias-4/"><img src="https://www.uv.mx/fei/files/2021/10/entNotasLauda-1600x550.png" alt="New York" class="d-block" style="width:100%"></a>
+        </div>
+    </div>
+        <!-- Left and right controls/icons -->
+            <button class="carousel-control-prev" type="button" data-bs-target="#demo" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#demo" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
+        </div>
+    </div>
+</div>
+<div class="p-2 text-white rounded text-center">
+    <h3>Conoce más de las Licenciaturas FEI</h3><br>
+    <span>Video promocional de las Licenciaturas que se ofertan el la Facultad de Estadística e Informática.</span><br><br>
+    <video src="https://lumen.uv.mx/resources/files/videos/2017/11/10/2478/1ae52c53-4fb6-43e1-98db-c7d53c4b4c4e.mp4" controls autoplay loop></video>
+</div>
 {% endblock %}
 {% block scripts %}
 <script src="{% static 'js/stickyBar.js' %}" type="text/javascript"></script>

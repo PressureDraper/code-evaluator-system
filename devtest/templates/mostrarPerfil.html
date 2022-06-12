@@ -32,6 +32,14 @@
         .selected {
             color: #405fd7;
         }
+
+        .noscript {
+            position: absolute;
+            background-color: white;
+            height: 100%;
+            width: 100%;
+            z-index: 100;
+        }
     </style>
 {% endblock %}
 {% block scripts %}
@@ -54,6 +62,11 @@
             <li><a href="/logout">Cerrar Sesión</a></li>
         </ul>
     </header>
+    <noscript>
+        <div class="noscript">
+            <strong>Lo sentimos pero esta página no puede trabajar bien sin JavaScript. Porfavor habilítalo para continuar.</strong>
+        </div>
+    </noscript>
     {% elif usuario == 'maestro' %}
     <header>
         <a href="#" class="title">Evaluador Turbo 3000</a>
@@ -72,6 +85,11 @@
             <li><a href="/logout">Cerrar Sesión</a></li>
         </ul>
     </header>
+    <noscript>
+        <div class="noscript">
+            <strong>Lo sentimos pero esta página no puede trabajar bien sin JavaScript. Porfavor habilítalo para continuar.</strong>
+        </div>
+    </noscript>
     {% endif %}
 {% endblock %}
 {% block content %}

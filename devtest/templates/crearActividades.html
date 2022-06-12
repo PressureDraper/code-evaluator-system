@@ -230,11 +230,28 @@
         resize: none;
         background-color: rgba(255, 255, 255, 0);
     }
+
+    .noscript {
+        position: absolute;
+        background-color: white;
+        height: 100%;
+        width: 100%;
+        z-index: 100;
+    }
 </style>
 {% endblock %}
 {% block scripts %}
 	<script src="{% static 'js/openWindow.js' %}" type="text/javascript"></script>
     <script src="{% static 'js/stickyBar.js' %}" type="text/javascript"></script>
+    <script>
+        function hello(){
+            const pageHeight = document.documentElement.scrollHeight;
+            $('#blurdiv').height(pageHeight)
+        }
+        $(function(){
+            $('div[onload]').trigger('onload');
+        });
+    </script>
 {% endblock %}
 {% block header %}
     <header>
@@ -254,6 +271,11 @@
             <li><a href="/logout">Cerrar Sesión</a></li>
         </ul>
     </header>
+    <noscript>
+        <div class="noscript">
+            <strong>Lo sentimos pero esta página no puede trabajar bien sin JavaScript. Porfavor habilítalo para continuar.</strong>
+        </div>
+    </noscript>
 {% endblock %}
 {% block content %}
     {% if grupo == 1 %}
@@ -264,7 +286,7 @@
     <h1><img src="https://cdn-icons-png.flaticon.com/512/1746/1746673.png" alt="security icon" width="auto" height="50"> {{ valor.asignatura }} <img src="https://cdn-icons-png.flaticon.com/512/1746/1746673.png" alt="security icon" width="auto" height="50"></h1>
     <hr size="10" style="color: rgba(15, 10, 222, 1);">
         {% if alumnos == 1 %}
-        <div class="blurbackground" id="blurdiv">
+        <div class="blurbackground" id="blurdiv" onload="hello()">
             <span id="close">&times;</span>
             <div class="setGroup">
                 <form action="/crear/" method="POST" enctype="multipart/form-data">

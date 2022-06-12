@@ -324,7 +324,7 @@ def mostrar_grupo(request):
         )
         obj.save()
 
-        return render(request, template, {'docente': data, 'grupo': 1})
+        return redirect('/alumnos')
 
 def mostrar_actividades(request):
     template = 'mostrarActividades.html'
